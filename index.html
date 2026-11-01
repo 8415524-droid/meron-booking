@@ -113,11 +113,13 @@ td.num,th.num{font-variant-numeric:tabular-nums}
 .panel{min-width:0;max-width:100%}
 #d_t,#o_clean,#a_roi,#l_p,#l_c,#bl_t,#lg_t,#fin_t,#e_list,#pay_t{overflow-x:auto}
 .login{display:grid;grid-template-columns:1.1fr 1fr;min-height:100vh}
-.login-art{background:radial-gradient(900px 500px at 80% 10%,#1d5260 0%,transparent 60%),linear-gradient(160deg,#0d2b33,#071a20);color:#dbe9ec;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.login-art{position:relative;overflow:hidden;background:linear-gradient(rgba(7,26,32,.55),rgba(7,26,32,.55)),url(rashbi.jpg) center/cover,radial-gradient(900px 500px at 80% 10%,#1d5260 0%,transparent 60%),linear-gradient(160deg,#0d2b33,#071a20);color:#dbe9ec;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
 .login-brand svg{flex:none;width:44px;height:44px}
 .login-brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
 .login-brand b{display:block;font-family:var(--font-display);font-size:26px;font-weight:900;color:#fff;line-height:1.1}
 .login-brand small{display:block;font-size:11px;letter-spacing:.16em;color:#d4a24c;margin-top:3px}
+.login-scene{position:absolute;left:0;right:0;bottom:0;width:100%;height:42%;pointer-events:none}
+.login-art h2,.login-art p,.login-brand{position:relative;z-index:1}
 .login-art h2{font-family:var(--font-display);font-size:38px;line-height:1.2;color:#fff;margin:0}
 .login-art p{font-size:16px;max-width:420px;color:#a9c3c9;margin:0}
 .login-form{display:flex;align-items:center;justify-content:center;padding:24px}
