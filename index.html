@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מערכת הזמנות מירון</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Frank+Ruhl+Libre:wght@700;900&display=swap">
+<style>
+html{color-scheme:light}
+/* פריסה: סרגל לשוניות עליון, אזור עבודה אחד. מסך הנציג הוא ברירת המחדל. */
+:root{
+  --bg:#eef1f2; --surface:#ffffff; --ink:#15222b; --muted:#5b6b75; --line:#d5dde1;
+  --accent:#0e6a6a; --accent-ink:#ffffff; --accent-soft:#d9eeee;
+  --ok:#1f7a3d; --ok-soft:#dcf1e3; --warn:#9a5b00; --warn-soft:#fbebcf; --bad:#a3262a; --bad-soft:#f8dcdd;
+  --font-ui:'Heebo',system-ui,sans-serif; --font-display:'Frank Ruhl Libre','Heebo',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f181d; --surface:#17232a; --ink:#e6eef1; --muted:#93a5af; --line:#2a3b44;
+  --accent:#4fc3c3; --accent-ink:#06201f; --accent-soft:#16393a;
+  --ok:#6fd08c; --ok-soft:#173a25; --warn:#f0b35a; --warn-soft:#3d2c0f; --bad:#ff8a8d; --bad-soft:#41191b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f181d; --surface:#17232a; --ink:#e6eef1; --muted:#93a5af; --line:#2a3b44;
+  --accent:#4fc3c3; --accent-ink:#06201f; --accent-soft:#16393a;
+  --ok:#6fd08c; --ok-soft:#173a25; --warn:#f0b35a; --warn-soft:#3d2c0f; --bad:#ff8a8d; --bad-soft:#41191b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.5;
+  padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin:0 auto}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 0 10px}
+h1{font-family:var(--font-display);font-weight:900;font-size:26px;margin:0}
+.sub{color:var(--muted);font-size:13px}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:16px}
+nav button{flex:none;border:0;background:transparent;color:var(--muted);font:500 15px var(--font-ui);padding:10px 14px;border-radius:8px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+nav button:hover:not([aria-selected="true"]){background:var(--accent-soft);color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px}
+.stack{display:flex;flex-direction:column;gap:14px}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+input,select,textarea{font:400 16px var(--font-ui);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:64px}
+.btn{font:500 15px var(--font-ui);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.between{justify-content:space-between}
+h2{font-family:var(--font-display);font-size:20px;margin:0 0 4px}
+h3{font-size:15px;margin:0}
+.opt{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.opt.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.opt .info{min-width:0;flex:1 1 220px}
+.meta{color:var(--muted);font-size:13px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:500;background:var(--accent-soft);color:var(--ink)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.empty{padding:28px 12px;text-align:center;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:10px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;font-size:14px;vertical-align:middle}
+th{color:var(--muted);font-weight:500;font-size:12px;white-space:nowrap}
+td.num,th.num{font-variant-numeric:tabular-nums}
+.cell{border:0;width:100%;min-width:92px;padding:8px 6px;border-radius:6px;font:500 12px var(--font-ui);cursor:pointer;text-align:center}
+.cell.free{background:var(--ok-soft);color:var(--ok)}
+.cell.busy{background:var(--bad-soft);color:var(--bad);cursor:default}
+.cell.part{background:var(--warn-soft);color:var(--warn);cursor:default}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px}
+.stat{background:var(--bg);border-radius:8px;padding:12px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums;font-family:var(--font-display)}
+.stat span{font-size:12px;color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:99px;font:400 13px var(--font-ui);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.note{font-size:13px;padding:10px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn)}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;font-size:14px;z-index:20}
+.dcell{width:26px;min-width:26px;height:28px;border:0;border-radius:4px;font-size:10px;padding:0;cursor:pointer}
+.dcell.free{background:var(--ok-soft)} .dcell.busy{background:var(--bad);cursor:default} .dcell.part{background:var(--warn);cursor:default}
+.dh{font-size:10px;padding:2px;text-align:center;min-width:26px} .dh.we{color:var(--accent);font-weight:700}
+.barrow{display:flex;gap:10px;align-items:center;margin:6px 0} .barrow>span:first-child{width:92px;font-size:13px;flex:none}
+.barwrap{background:var(--bg);border-radius:6px;flex:1;height:14px;min-width:0} .bar{height:14px;background:var(--accent);border-radius:6px;min-width:2px}
+.barrow>span:last-child{width:110px;font-size:12px;color:var(--muted);flex:none}
+.alert{padding:8px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-size:14px;margin-bottom:6px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap" id="appwrap" hidden>
+  <header>
+    <h1>הזמנות מירון</h1>
+    <span class="sub" id="status">טוען נתונים…</span>
+  </header>
+  <nav role="tablist" id="tabs"></nav>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="adapter.js"></script>
+</body>
+</html>
