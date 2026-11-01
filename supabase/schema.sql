@@ -48,3 +48,8 @@ alter table public.docs replica identity full;
 
 -- אחרי ההרצה מוסיפים את המשתמש הראשון:
 -- insert into public.staff (email, note) values ('כתובת-האימייל-שלך@example.com', 'מנהל');
+
+-- הקשחה (הוחלה על הפרויקט)
+revoke execute on function public.is_staff() from public, anon;
+grant execute on function public.is_staff() to authenticated;
+alter function public.touch_updated_at() set search_path = public;
