@@ -12,6 +12,7 @@ create table if not exists public.docs (
 -- רשימת אימיילים של אנשי הצוות המורשים. גם אם מישהו נרשם, בלי אימייל ברשימה הוא לא רואה כלום.
 create table if not exists public.staff (
   email text primary key,
+  role text not null default 'admin',
   note text
 );
 
