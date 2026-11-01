@@ -60,17 +60,17 @@
   function startApp(){
     document.getElementById("appwrap").hidden=false;
     var s=document.createElement("script");s.src="app.js";document.body.appendChild(s);
-    var hd=document.querySelector("header");
-    if(hd&&sb){var b=document.createElement("button");b.className="btn sm";b.textContent="יציאה";b.onclick=function(){sb.auth.signOut().then(function(){location.reload()})};hd.appendChild(b)}
+    var hd=document.getElementById("sidebtns");
+    if(hd&&sb){var b=document.createElement("button");b.className="btn sm";b.style.width="100%";b.textContent="יציאה";b.onclick=function(){sb.auth.signOut().then(function(){location.reload()})};hd.appendChild(b)}
   }
+  var LOGO='<svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8bd6a"/><stop offset="1" stop-color="#b9822a"/></linearGradient></defs><rect width="48" height="48" rx="13" fill="#123b45"/><path d="M5 37 L17 17 L24 27 L31 14 L43 37 Z" fill="#d9a84e"/><path d="M17 37 V30 L24 24 L31 30 V37 Z" fill="#0d2b33"/><rect x="22" y="31" width="4" height="6" rx="1" fill="#e8bd6a"/></svg>';
   function loginView(msg){
-    var o=el('<div style="max-width:380px;margin:12vh auto 0;padding:0 16px"><div class="panel stack">'
-      +'<h1 style="font-family:var(--font-display);font-size:26px;margin:0">הזמנות מירון</h1>'
-      +'<div class="meta">כניסה לצוות. אין הרשמה עצמית, המשתמשים מוגדרים על ידי המנהל.</div>'
+    var o=el('<div class="login"><div class="login-art"><div class="login-brand">'+LOGO+'<div><b>מירון סטיי</b><small>MERON STAY</small></div></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p></div>'
+      +'<div class="login-form"><div class="login-card"><h3>כניסה למערכת</h3><div class="meta">כניסה לצוות בלבד. המשתמשים מוגדרים על ידי המנהל.</div>'
       +'<label>אימייל<input id="lg_e" type="email" autocomplete="username" dir="ltr" style="text-align:right"></label>'
       +'<label>סיסמה<input id="lg_p" type="password" autocomplete="current-password" dir="ltr" style="text-align:right"></label>'
       +'<div class="note" id="lg_err" '+(msg?'':'hidden')+'>'+(msg||'')+'</div>'
-      +'<button class="btn primary" id="lg_b">כניסה</button></div></div>');
+      +'<button class="btn primary" id="lg_b" style="padding:12px">כניסה</button></div></div></div>');
     document.body.appendChild(o);
     function go(){
       var e=document.getElementById("lg_e").value.trim(),p=document.getElementById("lg_p").value;

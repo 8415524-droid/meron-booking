@@ -42,11 +42,21 @@ function del(col,id){return S.db.collection(col).doc(id).delete().then(function(
 function newId(col){return S.db.collection(col).doc().id}
 
 /* ---------- shell ---------- */
+var GROUPS=[["הזמנות","book",["dash","intake","bookings","cal","month"]],["נכסים ושיווק","home",["props","price","ads"]],["תפעול","tool",["ops","bills"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin"]]];
+var GICON={'book': '<path d="M4 5h16v14H4zM4 10h16M9 5v14"/>', 'home': '<path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6"/>', 'tool': '<path d="M14 6a4 4 0 005 5l-9 9-3-3 9-9a4 4 0 00-2-2z"/>', 'coin': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10c0-2 6-2 6 0s-6 2-6 4 6 2 6 0"/>'};
 function renderTabs(){
-  $("tabs").innerHTML=TABS.map(function(t){return '<button role="tab" data-tab="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'">'+t[1]+'</button>'}).join("");
+  var names={};TABS.forEach(function(t){names[t[0]]=t[1]});
+  $("tabs").innerHTML=GROUPS.map(function(g){
+    return '<div class="grp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+GICON[g[1]]+'</svg>'+g[0]+'</div>'+
+      g[2].map(function(k){return '<button role="tab" data-tab="'+k+'" aria-selected="'+(S.tab===k)+'">'+names[k]+'</button>'}).join("");
+  }).join("");
+  var pt=$("pagetitle");if(pt)pt.textContent=names[S.tab]||"";
+  document.body.classList.remove("menu-open");
 }
 function go(t){S.tab=t;renderTabs();mount()}
 document.addEventListener("click",function(e){
+  if(e.target.closest("#menubtn")){document.body.classList.toggle("menu-open");return}
+  if(e.target.id==="scrim"){document.body.classList.remove("menu-open");return}
   var t=e.target.closest("[data-tab]");if(t){go(t.dataset.tab);return}
   var a=e.target.closest("[data-act]");if(a)act(a.dataset.act,a.dataset.id,a);
 });
