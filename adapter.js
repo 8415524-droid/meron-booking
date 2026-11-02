@@ -112,5 +112,14 @@
     document.body.appendChild(el('<div style="max-width:420px;margin:12vh auto;padding:0 16px"><div class="panel note">האתר עדיין לא מחובר למסד הנתונים. יש למלא את הערכים בקובץ config.js.</div></div>'));
     return;
   }
+  /* קישור כניסה ישירה בזמן הבנייה: https://…/#k=<סיסמה>. הסיסמה לא נשמרת בקוד, רק בקישור שמחזיק המנהל. מבטלים בעת ההשקה: מוחקים את המשתמש builder@meron-booking.app. */
+  var km=(location.hash||"").match(/[#&]k=([^&]+)/);
+  if(km){
+    history.replaceState(null,"",location.pathname+location.search);
+    sb.auth.signInWithPassword({email:"builder@meron-booking.app",password:decodeURIComponent(km[1])}).then(function(r){
+      if(r.error)loginView("קישור הכניסה אינו תקף. היכנס עם אימייל.");else startApp();
+    });
+    return;
+  }
   sb.auth.getSession().then(function(r){if(r.data&&r.data.session)startApp();else loginView()});
 })();

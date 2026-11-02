@@ -1,0 +1,78 @@
+/* ערכת "לילה עירוני" — אותו סגנון של מערכת התעלות: טורקיז על דיו, רשת גרדיאנט, דפוס קשתות, פינות רכות.
+   נטען אחרי העיצוב הבסיסי ודורס רק טוקנים וצורות. */
+:root{
+  --font-ui:'IBM Plex Sans Hebrew','Heebo',system-ui,sans-serif;--font-display:'Frank Ruhl Libre','Heebo',serif;
+  --bg:#eef3f2;--surface:#ffffff;--ink:#10181d;--muted:#566a72;--line:#d8e2e2;
+  --accent:#0e8a7c;--accent-ink:#ffffff;--accent-soft:#e0f3f0;
+  --ok:#1f8f5f;--ok-soft:#dcf3e8;--warn:#a86a05;--warn-soft:#fbeccb;--bad:#c23b3b;--bad-soft:#f8dddd;
+  --gold:#d4a24c;--veil:rgba(243,246,246,.82);
+  --mesh1:rgba(20,184,166,.16);--mesh2:rgba(42,111,224,.10);
+  --shadow:0 1px 2px rgba(11,18,32,.04),0 16px 40px -22px rgba(11,18,32,.22);
+  --arch:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2740%27 height=%2740%27%3E%3Cpath d=%27M6 34V19a14 14 0 0 1 28 0v15%27 fill=%27none%27 stroke=%27%23000%27 stroke-width=%271.7%27 stroke-linecap=%27round%27/%3E%3Cpath d=%27M14 34V22a6 6 0 0 1 12 0v12%27 fill=%27none%27 stroke=%27%23000%27 stroke-width=%271.3%27 stroke-linecap=%27round%27 opacity=%27.6%27/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10141a;--surface:#171e26;--ink:#eef2f4;--muted:#a8b5bf;--line:#2a323d;
+  --accent:#33d6c0;--accent-ink:#08201c;--accent-soft:#102b27;
+  --ok:#3fd08a;--ok-soft:#12301f;--warn:#fbbf24;--warn-soft:#3a2d0c;--bad:#e2665f;--bad-soft:#3a1a19;
+  --veil:rgba(16,20,26,.82);--mesh1:rgba(51,214,192,.20);--mesh2:rgba(79,140,247,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 18px 44px -24px rgba(0,0,0,.7)}}
+:root[data-theme="dark"]{
+  --bg:#10141a;--surface:#171e26;--ink:#eef2f4;--muted:#a8b5bf;--line:#2a323d;
+  --accent:#33d6c0;--accent-ink:#08201c;--accent-soft:#102b27;
+  --ok:#3fd08a;--ok-soft:#12301f;--warn:#fbbf24;--warn-soft:#3a2d0c;--bad:#e2665f;--bad-soft:#3a1a19;
+  --veil:rgba(16,20,26,.82);--mesh1:rgba(51,214,192,.20);--mesh2:rgba(79,140,247,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 18px 44px -24px rgba(0,0,0,.7)}
+
+body{font-family:var(--font-ui);background-color:var(--bg);
+  background-image:radial-gradient(900px 520px at 88% -8%,var(--mesh1),transparent 62%),radial-gradient(760px 520px at -4% 24%,var(--mesh2),transparent 60%);
+  background-attachment:fixed}
+h1,h2,h3.disp{font-family:var(--font-display)}
+h2{font-size:23px;letter-spacing:-.01em}
+
+/* דפוס קשתות: מסכה, צבע חי מהטוקן */
+.side::before,.login-art::before,.hero::before,.stat::after{content:"";position:absolute;pointer-events:none;background-color:currentColor;
+  -webkit-mask:var(--arch) 0 0/40px repeat;mask:var(--arch) 0 0/40px repeat}
+.side{background:linear-gradient(185deg,#0d1218 0%,#10161d 55%,#0c1015 100%);position:sticky;color:#cbd5db}
+.side::before{inset:0;color:#33d6c0;opacity:.06;-webkit-mask-image:var(--arch),linear-gradient(180deg,#000 0,transparent 55%);mask-image:var(--arch),linear-gradient(180deg,#000 0,transparent 55%);-webkit-mask-size:40px,100% 100%;mask-size:40px,100% 100%;-webkit-mask-composite:source-in;mask-composite:intersect}
+.side>*{position:relative}
+.brand b{letter-spacing:-.01em}
+.grp{color:#7f929d}
+#tabs button{border-radius:12px;transition:background .15s,color .15s,transform .15s}
+#tabs button:hover{transform:translateX(-2px)}
+#tabs button[aria-selected="true"]{background:linear-gradient(270deg,rgba(51,214,192,.18),rgba(51,214,192,.04));color:#fff}
+#tabs button[aria-selected="true"]::before{background:#33d6c0;box-shadow:0 0 12px rgba(51,214,192,.7)}
+
+.topbar{background:var(--veil);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.panel{border-radius:20px;padding:22px;background:color-mix(in srgb,var(--surface) 94%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+.opt{border-radius:16px;transition:border-color .15s,transform .15s,box-shadow .15s}
+.opt:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));transform:translateY(-1px)}
+.stat{position:relative;overflow:hidden;border:1px solid var(--line);border-top:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.stat::after{left:-6px;bottom:-8px;width:110px;height:70px;color:var(--accent);opacity:.12;-webkit-mask-size:34px;mask-size:34px}
+.stat b{background:linear-gradient(180deg,var(--ink),color-mix(in srgb,var(--ink) 70%,var(--accent)));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.btn{border-radius:12px}
+.btn.primary{background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 92%,#fff),var(--accent));border-color:transparent;box-shadow:0 6px 18px -6px color-mix(in srgb,var(--accent) 60%,transparent)}
+.btn.primary:hover{filter:brightness(1.06)}
+input,select,textarea{border-radius:12px;background:color-mix(in srgb,var(--bg) 70%,var(--surface))}
+.pill{border-radius:99px}
+.chip[aria-pressed="true"]{box-shadow:0 4px 14px -6px var(--accent)}
+.note,.alert{border-radius:12px}
+th{background:color-mix(in srgb,var(--bg) 70%,var(--surface))}
+.scroll,#d_t,#o_clean,#a_roi,#l_p,#l_c,#bl_t,#lg_t,#fin_t,#e_list,#pay_t{scrollbar-width:thin}
+.toast{border-radius:99px;box-shadow:var(--shadow)}
+
+/* כניסה בתנועה רכה בכל החלפת מסך */
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#view>*{animation:rise .38s cubic-bezier(.16,1,.3,1) both}
+#view>*>*:nth-child(2){animation:rise .38s .05s cubic-bezier(.16,1,.3,1) both}
+#view>*>*:nth-child(3){animation:rise .38s .1s cubic-bezier(.16,1,.3,1) both}
+@media (prefers-reduced-motion:reduce){#view>*,#view>*>*{animation:none!important}#tabs button:hover{transform:none}}
+
+/* כניסה ואתר הזמנה */
+.login-art{position:relative;overflow:hidden;color:#dbe9ec;background:radial-gradient(800px 480px at 80% 0%,rgba(51,214,192,.22),transparent 60%),radial-gradient(600px 400px at 0% 100%,rgba(79,140,247,.16),transparent 60%),linear-gradient(160deg,#10161d,#0a0e13)}
+.login-art::before{inset:0;color:#33d6c0;opacity:.07;-webkit-mask-image:var(--arch),linear-gradient(180deg,#000 0,transparent 80%);mask-image:var(--arch),linear-gradient(180deg,#000 0,transparent 80%);-webkit-mask-size:44px,100% 100%;mask-size:44px,100% 100%;-webkit-mask-composite:source-in;mask-composite:intersect}
+.login-art>*{position:relative}.login-art .login-scene{position:absolute}
+.login-card{background:color-mix(in srgb,var(--surface) 90%,transparent);border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--shadow)}
+.hero::before{inset:0;color:#33d6c0;opacity:.07;-webkit-mask-image:var(--arch),linear-gradient(180deg,#000 0,transparent 80%);mask-image:var(--arch),linear-gradient(180deg,#000 0,transparent 80%);-webkit-mask-size:44px,100% 100%;mask-size:44px,100% 100%;-webkit-mask-composite:source-in;mask-composite:intersect}
+.card{border-radius:22px;box-shadow:var(--shadow)}
+.u{border-radius:18px;transition:transform .15s,border-color .15s}.u:hover{transform:translateY(-2px);border-color:var(--accent)}
+@media print{body{background:#fff!important}.side::before{display:none}}
