@@ -88,7 +88,7 @@ X.tabs.search={
       return '<div class="panel stack"><div class="row between"><div><h3>'+esc(first.name)+'</h3><div class="meta"><span dir="ltr">'+esc(first.phone||"")+'</span> · '+bs.filter(live).length+' הזמנות · סך '+a.money(sum)+'</div></div><div class="row">'+(first.phone?'<a class="btn sm" href="tel:'+esc(first.phone)+'">חייג</a>':'')+waBtn(first.phone,"שלום "+first.name+", ","WhatsApp")+'</div></div>'
        +bs.map(function(b){var st=a.STATUS[b.status]||["",""];
          return '<div class="opt"><div class="info"><b>'+esc(a.unitLabel(b))+'</b> <span class="pill '+st[1]+'">'+st[0]+'</span><div class="meta">'+dmy(b.in)+' עד '+dmy(b.out)+' · '+a.money(b.total)+' · שולם '+a.money(b.dep)+'</div></div><div class="row">'
-          +waBtn(b.phone,MSG.confirm(b),"הודעת אישור")+((b.dep||0)<(b.total||0)?waBtn(b.phone,MSG.deposit(b),"תזכורת מקדמה"):"")+'</div></div>'}).join("")+'</div>';
+          +waBtn(b.phone,MSG.confirm(b),"הודעת אישור")+'<button class="btn sm" data-act="voucher" data-id="'+b.id+'">שובר להדפסה</button>'+((b.dep||0)<(b.total||0)?waBtn(b.phone,MSG.deposit(b),"תזכורת מקדמה"):"")+'</div></div>'}).join("")+'</div>';
     }).join("");
   }
 };
@@ -147,6 +147,10 @@ X.tabs.alerts={
     el.innerHTML=L.length?L.map(function(x){return '<div class="opt"><div class="info"><span class="pill '+x.sev+'">'+(x.sev==="bad"?"דחוף":"לתשומת לב")+'</span> '+esc(x.text)+'</div><div class="row">'+(x.wa||"")+(x.tab?'<button class="btn sm" data-tab="'+x.tab+'">פתח</button>':'')+'</div></div>'}).join(""):'<div class="panel empty">אין התראות. הכול מסודר.</div>';
   }
 };
+X.dashAlerts=function(el){
+  var L=alertsList();if(!L.length)return;
+  el.insertAdjacentHTML("afterbegin",L.slice(0,6).map(function(x){return '<div class="alert">'+esc(x.text)+(x.tab?' <button class="btn sm" data-tab="'+x.tab+'">פתח</button>':'')+'</div>'}).join("")+(L.length>6?'<div class="meta"><button class="btn sm" data-tab="alerts">עוד '+(L.length-6)+' התראות</button></div>':''));
+};
 X.badge=function(){
   if(!A().S.ready)return;
   var n=alertsList().length,b=document.querySelector('#tabs [data-tab="alerts"]');if(!b)return;
@@ -199,6 +203,11 @@ X.act=function(act,id,el){
   var a=A();
   if(act==="rqOk"){var r=RQ.rows.filter(function(x){return x.id===id})[0];if(r)rqConvert(r);return true}
   if(act==="rqNo"){rqSet(id,"rejected");return true}
+  if(act==="voucher"){
+    var b=a.S.bookings.filter(function(x){return x.id===id})[0];if(!b)return true;
+    var w=window.open("","_blank");if(!w){a.toast("הדפדפן חסם חלון חדש");return true}
+    w.document.write('<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><title>שובר הזמנה</title><style>body{font:16px Arial,sans-serif;max-width:560px;margin:30px auto;padding:0 20px;color:#15222b}h1{margin:0 0 4px;color:#0d2b33}.s{color:#8a6a2a;font-size:12px;letter-spacing:.14em}table{width:100%;border-collapse:collapse;margin-top:18px}td{padding:10px 6px;border-bottom:1px solid #ddd}td:first-child{color:#667;width:38%}.f{margin-top:26px;font-size:13px;color:#667}</style><h1>כשר מירון</h1><div class="s">KASHER MERON</div><h2>שובר הזמנה</h2><table><tr><td>שם האורח</td><td>'+esc(b.name)+'</td></tr><tr><td>יחידה</td><td>'+esc(a.unitLabel(b))+'</td></tr><tr><td>כניסה</td><td>'+dmy(b.in)+'</td></tr><tr><td>יציאה</td><td>'+dmy(b.out)+'</td></tr><tr><td>אורחים</td><td>'+(b.guests||"")+'</td></tr><tr><td>סכום</td><td>₪'+Math.round(b.total||0)+'</td></tr><tr><td>שולם</td><td>₪'+Math.round(b.dep||0)+'</td></tr><tr><td>יתרה</td><td>₪'+Math.round((b.total||0)-(b.dep||0))+'</td></tr></table><div class="f">תודה שבחרתם בנו. נשמח לארח אתכם.</div><script>setTimeout(function(){print()},300)<\/script>');
+    w.document.close();return true}
   if(act==="rpPrint"){window.print();return true}
   if(act==="bkDl"){a.toast("מכין גיבוי…");fetchAll().then(function(rows){dl("meron-backup-"+a.today()+".json",JSON.stringify({taken:new Date().toISOString(),docs:rows}))}).catch(function(){a.toast("הגיבוי נכשל")});return true}
   if(act==="bkGet"){sb().from("backups").select("taken_at,data").eq("id",id).single().then(function(r){if(r.error){a.toast("ההורדה נכשלה");return}dl("meron-backup-"+r.data.taken_at.slice(0,10)+".json",JSON.stringify({taken:r.data.taken_at,docs:r.data.data}))});return true}

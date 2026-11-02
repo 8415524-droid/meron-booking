@@ -712,6 +712,7 @@ function updDash(){
   $("d_t").innerHTML=ev.length?'<table><thead><tr><th>תאריך</th><th></th><th>יחידה</th><th>אורח</th><th>טלפון</th></tr></thead><tbody>'+ev.map(function(e){return '<tr><td>'+fmt(e.d)+'</td><td><span class="pill '+(e.k==="כניסה"?'ok':'warn')+'">'+e.k+'</span></td><td>'+esc(unitLabel(e.b))+'</td><td>'+esc(e.b.name)+'</td><td dir="ltr">'+esc(e.b.phone||"")+'</td></tr>'}).join("")+'</tbody></table>':'<div class="meta">אין כניסות או יציאות בשבוע הקרוב.</div>';
   var ms=[],mx=1;for(i=0;i<6;i++){var dd=new Date();dd.setDate(1);dd.setMonth(dd.getMonth()-i);var m=iso(dd).slice(0,7),r=plCalc(m).rev;ms.push([m,r]);if(r>mx)mx=r}
   $("d_r").innerHTML=ms.reverse().map(function(x){return '<div class="barrow"><span>'+mLabel(x[0])+'</span><div class="barwrap"><div class="bar" style="width:'+Math.round(x[1]/mx*100)+'%"></div></div><span>'+money(x[1])+'</span></div>'}).join("");
+  if(window.MERON_X&&MERON_X.dashAlerts&&$("d_a"))MERON_X.dashAlerts($("d_a"));
 }
 
 /* ---------- advertising ---------- */
@@ -959,6 +960,7 @@ function load(){
 }
 S.tab=ROLE_HOME[ROLE]||"dash";
 window.MERON_APP={S:S,$:$,esc:esc,money:money,iso:iso,parse:parse,addDays:addDays,nights:nights,nextFriday:nextFriday,fmt:fmt,heb:heb,propById:propById,unitById:unitById,bookables:bookables,commission:commission,commNet:commNet,save:save,del:del,toast:toast,newId:newId,estimate:estimate,extraCosts:extraCosts,STATUS:STATUS,today:today,role:ROLE,go:go,refresh:refresh,overlap:overlap,unitLabel:unitLabel};
+if(ROLE==="viewer")document.body.classList.add("ro");
 renderTabs();mount();
 if(window.claude&&window.claude.use)load();else{$("status").textContent="המערכת פועלת רק בתוך claude.ai";}
 })();
