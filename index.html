@@ -37,7 +37,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:
 .brand small{display:block;font-size:11px;letter-spacing:.14em;color:var(--gold);margin-top:3px}
 #tabs{padding:4px 12px 12px;flex:1}
 .grp{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--side-mute);padding:16px 10px 6px;display:flex;align-items:center;gap:7px}
-.grp svg{opacity:.8}
+.grp svg{opacity:.8;flex:none}.grp .gname{flex:1;text-align:right}.grp .chev{transition:transform .2s}.grp[aria-expanded="false"] .chev{transform:rotate(90deg) scaleY(-1)}
+button.grp{width:100%;border:0;background:transparent;font-family:var(--font-ui);cursor:pointer;margin:2px 0;border-radius:9px}button.grp:hover{background:rgba(255,255,255,.06);color:var(--side-ink)}.gbody[hidden]{display:none}
+#tabs button.grp{display:flex;align-items:center;gap:7px;width:100%;font:700 12px var(--font-ui);letter-spacing:.08em;color:var(--side-mute);padding:11px 10px;margin-top:6px}#tabs button.grp:hover{transform:none;color:var(--side-ink)}
 #tabs button{display:block;width:100%;text-align:right;border:0;background:transparent;color:var(--side-ink);font:500 14.5px var(--font-ui);padding:9px 12px;border-radius:9px;cursor:pointer;margin:1px 0;position:relative}
 #tabs button:hover{background:rgba(255,255,255,.07);color:#fff}
 #tabs button[aria-selected="true"]{background:rgba(212,162,76,.16);color:#fff;font-weight:700}
