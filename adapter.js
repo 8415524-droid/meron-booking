@@ -74,18 +74,38 @@
     var o=el('<div class="login"><div class="login-art"><div class="login-brand">'+LOGO+'<div><b>כשר מירון</b><small>KASHER MERON</small></div></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p><svg class="login-scene" viewBox="0 0 600 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path d="M0 200 L110 120 L200 175 L330 70 L450 160 L520 120 L600 190 V260 H0 Z" fill="#14424e"/><path d="M0 225 L140 165 L260 205 L380 140 L500 200 L600 170 V260 H0 Z" fill="#0f3540"/><g><rect x="200" y="170" width="200" height="60" fill="#f4f1e8"/><rect x="170" y="190" width="40" height="40" fill="#e6e2d6"/><rect x="390" y="190" width="40" height="40" fill="#e6e2d6"/><path d="M235 170 a65 65 0 0 1 130 0 Z" fill="#3b82d6"/><path d="M170 190 a20 20 0 0 1 40 0 Z" fill="#3b82d6"/><path d="M390 190 a20 20 0 0 1 40 0 Z" fill="#3b82d6"/><path d="M300 105 V84" stroke="#d9a84e" stroke-width="4" stroke-linecap="round"/><circle cx="300" cy="80" r="4" fill="#d9a84e"/><path d="M282 230 v-26 a18 18 0 0 1 36 0 v26 Z" fill="#123b45"/><rect x="215" y="195" width="16" height="22" rx="8" fill="#3b82d6"/><rect x="369" y="195" width="16" height="22" rx="8" fill="#3b82d6"/></g><rect y="230" width="600" height="30" fill="#0a2229"/><g fill="#fff" opacity=".7"><circle cx="60" cy="40" r="1.6"/><circle cx="140" cy="70" r="1.2"/><circle cx="470" cy="30" r="1.8"/><circle cx="540" cy="80" r="1.3"/><circle cx="380" cy="50" r="1.2"/><circle cx="240" cy="25" r="1.4"/></g></svg></div>'
       +'<div class="login-form"><div class="login-card"><h3>כניסה למערכת</h3><div class="meta">כניסה לצוות בלבד. המשתמשים מוגדרים על ידי המנהל.</div>'
       +'<label>אימייל<input id="lg_e" type="email" autocomplete="username" dir="ltr" style="text-align:right"></label>'
-      +'<label>סיסמה<input id="lg_p" type="password" autocomplete="current-password" dir="ltr" style="text-align:right"></label>'
+      +'<label id="lg_pw" hidden>סיסמה<input id="lg_p" type="password" autocomplete="current-password" dir="ltr" style="text-align:right"></label>'
       +'<div class="note" id="lg_err" '+(msg?'':'hidden')+'>'+(msg||'')+'</div>'
-      +'<button class="btn primary" id="lg_b" style="padding:12px">כניסה</button></div></div></div>');
-    document.body.appendChild(o);
+      +'<button class="btn primary" id="lg_b" style="padding:12px">שלח לי קישור כניסה למייל</button>'
+      +'<button class="btn sm" id="lg_t" type="button" style="background:none;border:0;color:var(--muted);text-decoration:underline">כניסה עם סיסמה</button></div></div></div>');
+        document.body.appendChild(o);
+    var usePw=false;
+    function show(t,ok){var er=document.getElementById("lg_err");er.hidden=false;er.textContent=t;er.style.background=ok?"var(--ok-soft)":"";er.style.color=ok?"var(--ok)":""}
     function go(){
-      var e=document.getElementById("lg_e").value.trim(),p=document.getElementById("lg_p").value;
-      sb.auth.signInWithPassword({email:e,password:p}).then(function(r){
-        if(r.error){var er=document.getElementById("lg_err");er.hidden=false;er.textContent="האימייל או הסיסמה שגויים";return}
-        o.remove();startApp();
-      });
+      var e=document.getElementById("lg_e").value.trim();
+      if(!e){show("הקלד כתובת אימייל");return}
+      var btn=document.getElementById("lg_b");btn.disabled=true;
+      if(usePw){
+        sb.auth.signInWithPassword({email:e,password:document.getElementById("lg_p").value}).then(function(r){
+          btn.disabled=false;
+          if(r.error){show("האימייל או הסיסמה שגויים");return}
+          o.remove();startApp();
+        });
+      }else{
+        sb.auth.signInWithOtp({email:e,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}}).then(function(r){
+          btn.disabled=false;
+          if(r.error){show(/rate|seconds/i.test(r.error.message)?"נשלח קישור לפני רגע. המתן דקה ונסה שוב.":"לא ניתן לשלוח קישור לכתובת הזו. בדוק שהיא מורשית.");return}
+          show("שלחנו קישור כניסה ל־"+e+". פתח את המייל ולחץ על הקישור (בדוק גם בספאם).",true);
+        });
+      }
     }
     document.getElementById("lg_b").onclick=go;
+    document.getElementById("lg_t").onclick=function(){
+      usePw=!usePw;document.getElementById("lg_pw").hidden=!usePw;
+      document.getElementById("lg_t").textContent=usePw?"כניסה עם קישור במייל":"כניסה עם סיסמה";
+      document.getElementById("lg_b").textContent=usePw?"כניסה":"שלח לי קישור כניסה למייל";
+    };
+    document.getElementById("lg_e").addEventListener("keydown",function(ev){if(ev.key==="Enter")go()});
     document.getElementById("lg_p").addEventListener("keydown",function(ev){if(ev.key==="Enter")go()});
   }
   if(!configured){

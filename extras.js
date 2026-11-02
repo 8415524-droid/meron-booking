@@ -180,6 +180,71 @@ X.tabs.forecast={
   }
 };
 
+
+/* ---- בעלי נכסים: רשימה והוספה מהירה ---- */
+X.own={owner:"",phone:""};
+function urow(v){v=v||{};return '<div class="urow grid2" style="align-items:end;border-top:1px solid var(--line);padding-top:8px"><label>שם יחידה<input class="u-name" value="'+esc(v.name||"")+'" placeholder="לדוגמה: דירה 1"></label><label>מיטות<input class="u-beds" type="number" min="1" value="'+(v.beds||"")+'" inputmode="numeric"></label><label>חדרים<input class="u-rooms" type="number" min="1" value="'+(v.rooms||"")+'" inputmode="numeric"></label><label>מחיר ללילה<input class="u-price" type="number" min="0" value="'+(v.price||"")+'" inputmode="numeric"></label><label>חבילת שבת<input class="u-sp" type="number" min="0" value="'+(v.sp||"")+'" inputmode="numeric"></label><button type="button" class="btn sm danger" data-act="owDelRow">הסר</button></div>'}
+function ownersData(){
+  var a=A(),m={};
+  a.S.props.forEach(function(p){var k=p.owner||"ללא בעלים";var o=m[k]||(m[k]={name:k,phone:p.ownerPhone||"",houses:[]});if(!o.phone&&p.ownerPhone)o.phone=p.ownerPhone;o.houses.push(p)});
+  return Object.keys(m).sort(function(x,y){return x.localeCompare(y,"he")}).map(function(k){return m[k]});
+}
+X.tabs.owners={
+  mount:function(v){
+    v.innerHTML='<div class="stack"><div class="panel stack" id="ow_form"></div><div class="panel"><div class="row between"><h2>בעלי הנכסים</h2><input id="ow_q" type="search" placeholder="חיפוש בעל נכס או בית…" style="max-width:260px"></div></div><div id="ow_l" class="list"></div></div>';
+    X.tabs.owners.form();
+    document.getElementById("ow_q").addEventListener("input",X.tabs.owners.upd);
+    X.tabs.owners.upd();
+  },
+  form:function(keepOwner){
+    var el=document.getElementById("ow_form");if(!el)return;
+    el.innerHTML='<div><h2>הוספת בעל נכס ובית</h2><div class="meta">ממלאים פעם אחת: בעל הנכס, הבית, והיחידות שבו. אפשר להוסיף אחר כך בית נוסף לאותו בעל.</div></div>'
+     +'<div class="grid2"><label>שם בעל הנכס<input id="ow_n" value="'+esc(keepOwner?X.own.owner:"")+'" list="ow_names" autocomplete="off"></label><label>טלפון<input id="ow_p" type="tel" dir="ltr" style="text-align:right" value="'+esc(keepOwner?X.own.phone:"")+'"></label></div>'
+     +'<datalist id="ow_names">'+ownersData().map(function(o){return '<option value="'+esc(o.name)+'">'}).join("")+'</datalist>'
+     +'<div class="grid2"><label>שם הבית<input id="ow_h"></label><label>אזור או כתובת<input id="ow_a"></label><label>מסלול<select id="ow_m"><option value="regular">רגיל</option><option value="exclusive">בלעדי</option></select></label><label>עמלה באחוזים<input id="ow_c" type="number" min="0" max="100" value="15"></label><label>עלות ניקיון ליציאה<input id="ow_cl" type="number" min="0" value="150"></label></div>'
+     +'<h3>יחידות השכרה בבית</h3><div class="meta">אם יש יחידה אחת בלבד אפשר להשאיר את השם ריק.</div><div id="ow_units" class="stack" style="gap:8px">'+urow()+'</div>'
+     +'<div class="row"><button type="button" class="btn sm" data-act="owAddRow">הוסף יחידה</button></div><div class="note" id="ow_err" hidden></div>'
+     +'<div class="row"><button type="button" class="btn primary" data-act="owSave">שמור</button><button type="button" class="btn" data-act="owSaveMore">שמור והוסף בית נוסף לאותו בעל</button></div>';
+  },
+  upd:function(){
+    var a=A(),el=document.getElementById("ow_l");if(!el)return;
+    var q=((document.getElementById("ow_q")||{}).value||"").trim().toLowerCase();
+    var os=ownersData().filter(function(o){return !q||o.name.toLowerCase().indexOf(q)>=0||o.houses.some(function(h){return (h.name||"").toLowerCase().indexOf(q)>=0})});
+    if(!os.length){el.innerHTML='<div class="panel empty">'+(q?'לא נמצאו תוצאות.':'עדיין אין בעלי נכסים. הוסף את הראשון בטופס למעלה.')+'</div>';return}
+    el.innerHTML=os.map(function(o){
+      var us=0,beds=0;
+      var hh=o.houses.map(function(h){var u=a.S.units.filter(function(x){return x.houseId===h.id});us+=u.length||1;beds+=u.length?u.reduce(function(s,x){return s+(+x.beds||0)},0):(+h.beds||0);
+        return '<div class="meta"><b>'+esc(h.name)+'</b>'+(h.area?' · '+esc(h.area):'')+' · '+(u.length?u.map(function(x){return esc(x.name)}).join("، "):'יחידה אחת')+' · עמלה '+(h.pct!=null?h.pct:15)+'%'+(h.active===false?' · <span class="pill bad">לא פעיל</span>':'')+'</div>'}).join("");
+      return '<div class="panel stack"><div class="row between"><div><h3>'+esc(o.name)+'</h3><div class="meta">'+(o.phone?'<span dir="ltr">'+esc(o.phone)+'</span> · ':'')+o.houses.length+' בתים · '+us+' יחידות · '+beds+' מיטות</div></div><div class="row">'
+       +(o.phone?'<a class="btn sm" href="tel:'+esc(o.phone)+'">חייג</a>'+waBtn(o.phone,"שלום "+o.name+", ","WhatsApp"):'')
+       +'<button class="btn sm" data-act="owMore" data-id="'+esc(o.name)+'">הוסף בית</button><button class="btn sm" data-act="owEdit" data-id="'+esc(o.name)+'">ערוך פרטים</button></div></div>'+hh+'</div>';
+    }).join("");
+  }
+};
+function owSave(more){
+  var a=A();if(a.role==="viewer"){a.toast("צפייה בלבד");return}
+  var $=function(i){return document.getElementById(i)},err=$("ow_err");
+  function bad(t){err.textContent=t;err.hidden=false}
+  var owner=$("ow_n").value.trim(),phone=$("ow_p").value.trim(),hn=$("ow_h").value.trim();
+  if(!owner)return bad("חסר שם בעל הנכס");if(!hn)return bad("חסר שם הבית");
+  var rows=[].slice.call(document.querySelectorAll("#ow_units .urow")).map(function(r){var g=function(c){return r.querySelector(c).value.trim()};return {name:g(".u-name"),beds:+g(".u-beds")||0,rooms:+g(".u-rooms")||0,price:+g(".u-price")||0,sp:+g(".u-sp")||0}});
+  var named=rows.filter(function(r){return r.name});
+  if(rows.length>1&&named.length!==rows.length)return bad("בכל יחידה צריך שם, כשיש יותר מיחידה אחת");
+  var base=rows[0]||{};
+  var beds=rows.reduce(function(s,r){return s+r.beds},0)||1,rooms=rows.reduce(function(s,r){return s+r.rooms},0)||1;
+  var hid=a.newId("properties");
+  var house={name:hn,area:$("ow_a").value.trim(),beds:beds,rooms:rooms,price:base.price||0,shabbatPrice:base.sp||0,owner:owner,ownerPhone:phone,mode:$("ow_m").value,pct:+$("ow_c").value||0,cleanCost:+$("ow_cl").value||0,notes:"",active:true};
+  err.hidden=true;
+  var jobs=[a.save("properties",hid,house)];
+  if(named.length)named.forEach(function(r){jobs.push(a.save("units",a.newId("units"),{houseId:hid,name:r.name,beds:r.beds||1,rooms:r.rooms||1,price:r.price,shabbatPrice:r.sp,active:true}))});
+  Promise.all(jobs).then(function(){
+    X.own={owner:owner,phone:phone};
+    a.toast("נשמר: "+hn+(named.length?" ("+named.length+" יחידות)":""));
+    X.tabs.owners.form(more);X.tabs.owners.upd();
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+}
+
 /* ---- גיבוי ---- */
 function dl(name,text){var d=window.claude&&window.claude.use?window.claude.use("downloads"):null;if(!d)return;d.then(function(x){x.save({filename:name,data:new Blob([text],{type:"application/json"})})})}
 async function fetchAll(){
@@ -201,6 +266,17 @@ X.tabs.backup={
 /* ---- פעולות ---- */
 X.act=function(act,id,el){
   var a=A();
+  if(act==="owAddRow"){var c=document.getElementById("ow_units"),last=c.querySelector(".urow:last-child");var v={};if(last){v={beds:last.querySelector(".u-beds").value,rooms:last.querySelector(".u-rooms").value,price:last.querySelector(".u-price").value,sp:last.querySelector(".u-sp").value}}c.insertAdjacentHTML("beforeend",urow(v));var n=c.querySelectorAll(".u-name");n[n.length-1].focus();return true}
+  if(act==="owDelRow"){var r=el.closest(".urow");if(document.querySelectorAll("#ow_units .urow").length>1)r.remove();return true}
+  if(act==="owSave"){owSave(false);return true}
+  if(act==="owSaveMore"){owSave(true);return true}
+  if(act==="owMore"){var o=ownersData().filter(function(x){return x.name===id})[0];X.own={owner:id,phone:o?o.phone:""};X.tabs.owners.form(true);window.scrollTo({top:0,behavior:"smooth"});document.getElementById("ow_h").focus();return true}
+  if(act==="owEdit"){
+    if(a.role==="viewer"){a.toast("צפייה בלבד");return true}
+    var o2=ownersData().filter(function(x){return x.name===id})[0];if(!o2)return true;
+    var nn=prompt("שם בעל הנכס:",o2.name);if(nn==null)return true;nn=nn.trim()||o2.name;
+    var np=prompt("טלפון:",o2.phone||"");if(np==null)return true;
+    Promise.all(o2.houses.map(function(h){return a.save("properties",h.id,(function(d){delete d.id;d.owner=nn;d.ownerPhone=np.trim();return d})(Object.assign({},h)))})).then(function(){a.toast("הפרטים עודכנו")});return true}
   if(act==="rqOk"){var r=RQ.rows.filter(function(x){return x.id===id})[0];if(r)rqConvert(r);return true}
   if(act==="rqNo"){rqSet(id,"rejected");return true}
   if(act==="voucher"){
