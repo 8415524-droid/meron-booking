@@ -1,34 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" preserveAspectRatio="xMidYMax slice">
 <defs>
 <linearGradient id="dm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5be8d8"/><stop offset="1" stop-color="#14988a"/></linearGradient>
-<linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9dbb8"/><stop offset="1" stop-color="#c9b389"/></linearGradient>
-<radialGradient id="gl" cx=".5" cy=".75" r=".8"><stop offset="0" stop-color="#ffd98a"/><stop offset="1" stop-color="#b8681f"/></radialGradient>
-<pattern id="bk" width="34" height="18" patternUnits="userSpaceOnUse"><path d="M0 .5H34M0 9.5H34M0 18.5H34M17 .5V9.5M0 9.5V18.5M34 9.5V18.5" stroke="#8d7a55" stroke-opacity=".28" stroke-width="1" fill="none"/></pattern>
+<linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eadcb9"/><stop offset="1" stop-color="#cdb88c"/></linearGradient>
+<linearGradient id="in" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b5a43"/><stop offset="1" stop-color="#d9c9a2"/></linearGradient>
+<pattern id="bk" width="38" height="20" patternUnits="userSpaceOnUse"><path d="M0 .5H38M0 10.5H38M0 20.5H38M19 .5V10.5M0 10.5V20.5M38 10.5V20.5" stroke="#8d7a55" stroke-opacity=".3" stroke-width="1" fill="none"/></pattern>
+<path id="ap" d="M274 262 A56 56 0 0 1 386 262"/>
 </defs>
 <g fill="#143b46"><path d="M0 215 L100 140 L190 190 L320 90 L430 175 L510 130 L600 200 V300 H0Z"/></g>
-<g fill="#0f2f39"><path d="M0 250 L130 190 L250 235 L380 170 L500 230 L600 195 V300 H0Z"/></g>
-<!-- מדרגות ומעקה -->
-<g><path d="M40 285 H150 V262 H132 V240 H114 V218 H96 V196 H78 V285Z" fill="#cdb98f"/>
-<path d="M78 196 H96 V218 H114 V240 H132 V262 H150" fill="none" stroke="#a9946a" stroke-width="1.5"/>
-<g stroke="#10202a" stroke-width="3" stroke-linecap="round"><path d="M72 172 L152 240"/><path d="M72 152 L152 220"/><path d="M80 172V196M96 186V218M112 200V240M128 214V262M144 230V262"/></g>
-<path d="M72 150 V196" stroke="#10202a" stroke-width="4" stroke-linecap="round"/></g>
-<!-- הבניין -->
-<rect x="150" y="150" width="330" height="140" fill="url(#wl)"/>
-<rect x="150" y="150" width="330" height="140" fill="url(#bk)"/>
-<rect x="150" y="146" width="330" height="8" fill="#ddcca4"/>
-<!-- כיפות -->
-<path d="M178 148 a62 62 0 0 1 124 0Z" fill="url(#dm)"/>
-<path d="M322 148 a52 52 0 0 1 104 0Z" fill="url(#dm)"/>
+<!-- כיפות מאחורי הקיר -->
+<path d="M205 150 a52 52 0 0 1 104 0Z" fill="url(#dm)"/>
+<path d="M330 150 a44 44 0 0 1 88 0Z" fill="url(#dm)"/>
+<!-- קיר האבן -->
+<rect x="120" y="140" width="400" height="160" fill="url(#wl)"/>
+<rect x="120" y="140" width="400" height="160" fill="url(#bk)"/>
+<rect x="120" y="136" width="400" height="8" fill="#e2d2aa"/>
 <!-- שלט -->
-<rect x="232" y="196" width="170" height="16" rx="2" fill="#f1e8d2"/>
-<g fill="#8a7650" opacity=".55"><rect x="244" y="202" width="26" height="3" rx="1.5"/><rect x="276" y="202" width="40" height="3" rx="1.5"/><rect x="322" y="202" width="30" height="3" rx="1.5"/><rect x="358" y="202" width="30" height="3" rx="1.5"/></g>
-<!-- קשת כניסה -->
-<path d="M258 290 V248 a58 58 0 0 1 116 0 V290Z" fill="none" stroke="#f6f0e0" stroke-width="9"/>
-<path d="M266 290 V250 a50 50 0 0 1 100 0 V290Z" fill="url(#gl)"/>
-<path d="M292 290 V272 a24 24 0 0 1 48 0 V290Z" fill="#2a1608" opacity=".65"/>
-<!-- חלונות -->
-<g><path d="M410 262 V246 a8 8 0 0 1 16 0 V262Z" fill="#2fb5a8"/><path d="M432 262 V246 a8 8 0 0 1 16 0 V262Z" fill="#e2a24a"/>
-<path d="M410 262 H426M432 262 H448" stroke="#f6f0e0" stroke-width="3"/></g>
-<rect x="0" y="288" width="600" height="12" fill="#0a1217"/>
-<g fill="#fff" opacity=".7"><circle cx="40" cy="30" r="1.6"/><circle cx="120" cy="64" r="1.2"/><circle cx="470" cy="28" r="1.8"/><circle cx="560" cy="76" r="1.3"/><circle cx="380" cy="40" r="1.2"/><circle cx="250" cy="22" r="1.4"/><circle cx="530" cy="150" r="1.2"/></g>
+<rect x="228" y="172" width="204" height="22" rx="2" fill="#f4eddb"/>
+<text x="330" y="188" text-anchor="middle" direction="rtl" font-family="'Frank Ruhl Libre','David','Arial Hebrew',Arial,sans-serif" font-weight="700" font-size="15" fill="#1c2f6b">עיר וקדיש מן שמיא נחית</text>
+<!-- קשת הכניסה -->
+<path d="M274 300 V262 A56 56 0 0 1 386 262 V300Z" fill="url(#in)"/>
+<!-- חלונות ויטראז' -->
+<g><path d="M306 290 V272 a10 10 0 0 1 20 0 V290Z" fill="#2b6fb8"/><path d="M334 290 V272 a10 10 0 0 1 20 0 V290Z" fill="#2b6fb8"/>
+<path d="M310 290 V276 a6 6 0 0 1 12 0 V290Z" fill="#e2a24a"/><path d="M338 290 V276 a6 6 0 0 1 12 0 V290Z" fill="#3fa97a"/>
+<path d="M306 290H326M334 290H354" stroke="#f4eddb" stroke-width="2.5"/></g>
+<path d="M274 300 V262 A56 56 0 0 1 386 262 V300" fill="none" stroke="#f7f2e4" stroke-width="13"/>
+<text font-family="'Frank Ruhl Libre','David','Arial Hebrew',Arial,sans-serif" font-weight="700" font-size="12.5" fill="#1c2f6b" direction="rtl"><textPath href="#ap" startOffset="50%" text-anchor="middle" direction="rtl" dy="4">כי לא תשכח מפי זרעו</textPath></text>
+<!-- קשת נמוכה משמאל -->
+<path d="M140 300 V262 a26 26 0 0 1 52 0 V300Z" fill="#6b5a43"/>
+<path d="M140 300 V262 a26 26 0 0 1 52 0 V300" fill="none" stroke="#f1e8d0" stroke-width="7"/>
+<!-- מדרגות ומעקה ברזל -->
+<g><path d="M20 300 H122 V280 H108 V262 H94 V244 H80 V226 H66 V300Z" fill="#cdb98f"/>
+<path d="M66 226 H80 V244 H94 V262 H108 V280 H122" fill="none" stroke="#a9946a" stroke-width="1.5"/>
+<g stroke="#18222e" stroke-width="3" stroke-linecap="round"><path d="M60 200 L128 270"/><path d="M60 178 L128 246"/><path d="M68 200V226M82 214V244M96 228V262M110 242V280M124 256V280"/></g>
+<path d="M60 176 V226" stroke="#18222e" stroke-width="4.5" stroke-linecap="round"/><path d="M60 188 H150" stroke="#18222e" stroke-width="3" stroke-linecap="round"/></g>
+<!-- פנס -->
+<rect x="452" y="226" width="12" height="14" rx="2" fill="#2a2f38"/><circle cx="458" cy="233" r="14" fill="#ffd98a" opacity=".18"/>
+<rect x="0" y="292" width="600" height="8" fill="#0a1217"/>
+<g fill="#fff" opacity=".7"><circle cx="40" cy="30" r="1.6"/><circle cx="130" cy="64" r="1.2"/><circle cx="470" cy="28" r="1.8"/><circle cx="560" cy="76" r="1.3"/><circle cx="390" cy="40" r="1.2"/><circle cx="250" cy="22" r="1.4"/></g>
 </svg>
