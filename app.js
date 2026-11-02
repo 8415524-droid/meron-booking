@@ -32,20 +32,21 @@ function estimate(p,ci,co){
 
 /* ---------- db ---------- */
 function save(col,id,data,msg){
+  if(ROLE==="viewer"){toast("צפייה בלבד, אין הרשאה לשנות");return Promise.resolve()}
   if(!S.db){toast("אין חיבור למסד הנתונים");return Promise.resolve()}
   var ref=S.db.collection(col).doc(id);
   return ref.set(data).then(function(){if(msg)toast(msg)}).catch(function(e){
     toast(e&&e.code==="invalid_argument"?"אין הרשאת כתיבה למשתמש זה":"השמירה נכשלה, נסה שוב");
   });
 }
-function del(col,id){return S.db.collection(col).doc(id).delete().then(function(){toast("נמחק")}).catch(function(){toast("המחיקה נכשלה")})}
+function del(col,id){if(ROLE==="viewer"){toast("צפייה בלבד, אין הרשאה לשנות");return Promise.resolve()}return S.db.collection(col).doc(id).delete().then(function(){toast("נמחק")}).catch(function(){toast("המחיקה נכשלה")})}
 function newId(col){return S.db.collection(col).doc().id}
 
 /* ---------- shell ---------- */
 var ROLE=window.MERON_ROLE||"admin";
 var ROLE_TABS={agent:["requests","intake","bookings","search","cal","month","props","alerts"],owner:["bookings","cal","report"],vendor:["ops"],partner:["dash","bookings","forecast","pl","fin","ledger"]};
-var ROLE_HOME={admin:"dash",agent:"intake",owner:"bookings",vendor:"ops",partner:"dash"};
-function tabAllowed(k){return ROLE==="admin"||(ROLE_TABS[ROLE]||[]).indexOf(k)>=0}
+var ROLE_HOME={viewer:"dash",admin:"dash",agent:"intake",owner:"bookings",vendor:"ops",partner:"dash"};
+function tabAllowed(k){return ROLE==="admin"||ROLE==="viewer"||(ROLE_TABS[ROLE]||[]).indexOf(k)>=0}
 var GROUPS=[["הזמנות","book",["dash","requests","intake","bookings","search","cal","month","forecast"]],["נכסים ושיווק","home",["props","price","ads"]],["תפעול","tool",["ops","bills","alerts"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin","report"]],["מערכת","tool",["backup"]]];
 var GICON={'book': '<path d="M4 5h16v14H4zM4 10h16M9 5v14"/>', 'home': '<path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6"/>', 'tool': '<path d="M14 6a4 4 0 005 5l-9 9-3-3 9-9a4 4 0 00-2-2z"/>', 'coin': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10c0-2 6-2 6 0s-6 2-6 4 6 2 6 0"/>'};
 function renderTabs(){

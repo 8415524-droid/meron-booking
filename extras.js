@@ -56,8 +56,9 @@ X.tabs.requests={
     }).join("");
   }
 };
-function rqSet(id,status){return sb().from("requests").update({status:status}).eq("id",id).then(rqLoad)}
+function rqSet(id,status){if(A().role==="viewer"){A().toast("צפייה בלבד");return Promise.resolve()}return sb().from("requests").update({status:status}).eq("id",id).then(rqLoad)}
 function rqConvert(r){
+  if(A().role==="viewer"){A().toast("צפייה בלבד");return}
   var a=A(),u=a.unitById(r.unit_id);
   if(!u){a.toast("היחידה כבר לא קיימת במערכת");return}
   var busy=a.S.bookings.some(function(b){return live(b)&&b.status!=="done"&&bUnit(b)===u.id&&a.overlap(r.check_in,r.check_out,b.in,b.out)});
