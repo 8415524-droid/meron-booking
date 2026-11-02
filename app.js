@@ -49,22 +49,21 @@ var ROLE_HOME={viewer:"dash",admin:"dash",agent:"intake",owner:"bookings",vendor
 function tabAllowed(k){if(k==="users")return ROLE==="admin";return ROLE==="admin"||ROLE==="viewer"||(ROLE_TABS[ROLE]||[]).indexOf(k)>=0}
 var GROUPS=[["הזמנות","book",["dash","requests","intake","bookings","search","cal","month","forecast"]],["נכסים ושיווק","home",["owners","props","price","ads"]],["תפעול","tool",["ops","bills","alerts"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin","report"]],["מערכת","tool",["users","backup"]]];
 var GICON={'book': '<path d="M4 5h16v14H4zM4 10h16M9 5v14"/>', 'home': '<path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6"/>', 'tool': '<path d="M14 6a4 4 0 005 5l-9 9-3-3 9-9a4 4 0 00-2-2z"/>', 'coin': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10c0-2 6-2 6 0s-6 2-6 4 6 2 6 0"/>'};
-var GOPEN=(function(){try{return JSON.parse(localStorage.getItem("meron_gopen")||"null")}catch(e){return null}})();
-function saveG(){try{localStorage.setItem("meron_gopen",JSON.stringify(GOPEN))}catch(e){}}
+var GOPEN={};
+function saveG(){}
 function renderTabs(){
   var names={};TABS.forEach(function(t){names[t[0]]=t[1]});
   if(!GOPEN)GOPEN={};
-  GROUPS.forEach(function(g){if(g[2].indexOf(S.tab)>-1&&GOPEN[g[0]]!==true){GOPEN[g[0]]=true}});
   $("tabs").innerHTML=GROUPS.map(function(g){
     var ks=g[2].filter(tabAllowed);if(!ks.length)return "";
-    var open=GOPEN[g[0]]===true||(GOPEN[g[0]]===undefined&&g[0]==="הזמנות");
+    var open=GOPEN[g[0]]===true;
     return '<button type="button" class="grp" data-grp="'+g[0]+'" aria-expanded="'+open+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+GICON[g[1]]+'</svg><span class="gname">'+g[0]+'</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>'+
       '<div class="gbody"'+(open?'':' hidden')+'>'+ks.map(function(k){return '<button role="tab" data-tab="'+k+'" aria-selected="'+(S.tab===k)+'">'+names[k]+'</button>'}).join("")+'</div>';
   }).join("");
   var pt=$("pagetitle");if(pt)pt.textContent=names[S.tab]||"";
   document.body.classList.remove("menu-open");
 }
-function go(t){S.tab=t;renderTabs();mount()}
+function go(t){S.tab=t;GOPEN={};renderTabs();mount()}
 document.addEventListener("click",function(e){
   if(e.target.closest("#menubtn")){document.body.classList.toggle("menu-open");return}
   if(e.target.id==="scrim"){document.body.classList.remove("menu-open");return}
