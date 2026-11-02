@@ -2,7 +2,6 @@
 drop policy if exists docs_viewer_read on public.docs;
 create policy docs_viewer_read on public.docs for select to authenticated
   using (public.my_role() = 'viewer');
-drop policy if exists backups_viewer on public.backups;
 insert into public.staff (email, role, note) values
   ('7624930@gmail.com','viewer','יעקב ויספיש'),
   ('a053410@gmail.com','viewer','שמואל ויספיש'),
