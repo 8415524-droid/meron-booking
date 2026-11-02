@@ -246,6 +246,40 @@ function owSave(more){
   });
 }
 
+
+/* ---- משתמשים והרשאות ---- */
+var RL={admin:"מנהל",agent:"נציג טלפוני",owner:"בעל בית",vendor:"איש מקצוע",partner:"שותף",viewer:"צפייה בלבד",guest:"אורח (קישור)"};
+var US={rows:[],loaded:false,err:null,edit:null};
+function usLoad(){
+  sb().rpc("staff_list").then(function(r){
+    US.loaded=true;if(r.error){US.err=r.error.message;US.rows=[]}else{US.err=null;US.rows=r.data||[]}
+    if(A().S.tab==="users")X.tabs.users.upd();
+  });
+}
+X.tabs.users={
+  mount:function(v){
+    v.innerHTML='<div class="stack"><div class="panel stack" id="us_form"></div><div class="panel"><h2>משתמשים מורשים</h2><div class="meta">מי יכול להיכנס ומה הוא רואה. משתמש חדש צריך להיווצר גם ב־Supabase (Authentication ואז Users ואז Add user), ואז כאן מגדירים לו תפקיד.</div></div><div id="us_l" class="list"></div></div>';
+    X.tabs.users.form();usLoad();
+  },
+  form:function(){
+    var a=A(),el=document.getElementById("us_form");if(!el)return;var e=US.edit||{role:"agent",houses:[]};
+    el.innerHTML='<h3>'+(US.edit?'עריכת משתמש':'הוספת משתמש מורשה')+'</h3><div class="grid2"><label>אימייל<input id="us_e" type="email" dir="ltr" style="text-align:right" value="'+esc(e.email||"")+'" '+(US.edit?'readonly':'')+'></label><label>תפקיד<select id="us_r">'+Object.keys(RL).map(function(k){return '<option value="'+k+'" '+(k===e.role?'selected':'')+'>'+RL[k]+'</option>'}).join("")+'</select></label><label>שם או הערה<input id="us_n" value="'+esc(e.note||"")+'"></label><label id="us_vw">שם איש המקצוע (כפי שמופיע בקריאות)<input id="us_v" value="'+esc(e.vendor||"")+'"></label></div>'
+     +'<div id="us_hw"><div class="meta">בתים שבעל הבית רואה:</div><div class="chips" style="margin-top:6px">'+a.S.props.map(function(h){return '<label class="chip" style="flex-direction:row;gap:6px;align-items:center"><input type="checkbox" class="us-h" value="'+esc(h.id)+'" style="width:auto" '+((e.houses||[]).indexOf(h.id)>=0?'checked':'')+'>'+esc(h.name)+'</label>'}).join("")+'</div></div>'
+     +'<div class="note" id="us_err" hidden></div><div class="row"><button class="btn primary" data-act="usSave">שמור</button>'+(US.edit?'<button class="btn" data-act="usCancel">ביטול</button>':'')+'</div>';
+    function sync(){var r=document.getElementById("us_r").value;document.getElementById("us_hw").hidden=r!=="owner";document.getElementById("us_vw").hidden=r!=="vendor"}
+    document.getElementById("us_r").onchange=sync;sync();
+  },
+  upd:function(){
+    var el=document.getElementById("us_l");if(!el)return;
+    if(!US.loaded){el.innerHTML='<div class="panel empty">טוען…</div>';return}
+    if(US.err){el.innerHTML='<div class="panel note">לא ניתן לטעון (ייתכן שהסקריפט staff-admin.sql עדיין לא הורץ): '+esc(US.err)+'</div>';return}
+    el.innerHTML=US.rows.map(function(u){
+      var hs=(u.houses||[]).map(function(id){var h=A().propById(id);return h?h.name:id}).join("، ");
+      return '<div class="opt"><div class="info"><h3 dir="ltr" style="text-align:right">'+esc(u.email)+' <span class="pill">'+esc(RL[u.role]||u.role)+'</span></h3><div class="meta">'+esc(u.note||"")+(hs?' · בתים: '+esc(hs):'')+(u.vendor?' · איש מקצוע: '+esc(u.vendor):'')+'</div></div><div class="row"><button class="btn sm" data-act="usEdit" data-id="'+esc(u.email)+'">ערוך</button><button class="btn sm danger" data-act="usDel" data-id="'+esc(u.email)+'">הסר</button></div></div>';
+    }).join("")||'<div class="panel empty">אין משתמשים.</div>';
+  }
+};
+
 /* ---- גיבוי ---- */
 function dl(name,text){var d=window.claude&&window.claude.use?window.claude.use("downloads"):null;if(!d)return;d.then(function(x){x.save({filename:name,data:new Blob([text],{type:"application/json"})})})}
 async function fetchAll(){
@@ -278,6 +312,18 @@ X.act=function(act,id,el){
     var nn=prompt("שם בעל הנכס:",o2.name);if(nn==null)return true;nn=nn.trim()||o2.name;
     var np=prompt("טלפון:",o2.phone||"");if(np==null)return true;
     Promise.all(o2.houses.map(function(h){return a.save("properties",h.id,(function(d){delete d.id;d.owner=nn;d.ownerPhone=np.trim();return d})(Object.assign({},h)))})).then(function(){a.toast("הפרטים עודכנו")});return true}
+  if(act==="usEdit"){US.edit=US.rows.filter(function(u){return u.email===id})[0]||null;X.tabs.users.form();window.scrollTo({top:0,behavior:"smooth"});return true}
+  if(act==="usCancel"){US.edit=null;X.tabs.users.form();return true}
+  if(act==="usDel"){if(!confirm("להסיר את "+id+" מהמורשים? הוא לא יוכל להיכנס."))return true;sb().rpc("staff_delete",{p_email:id}).then(function(r){a.toast(r.error?"המחיקה נכשלה":"הוסר");usLoad()});return true}
+  if(act==="usSave"){
+    var em=document.getElementById("us_e").value.trim(),ro=document.getElementById("us_r").value,er=document.getElementById("us_err");
+    if(em.indexOf("@")<1){er.textContent="כתובת אימייל לא תקינה";er.hidden=false;return true}
+    var hs=[].slice.call(document.querySelectorAll(".us-h:checked")).map(function(c){return c.value});
+    if(ro==="owner"&&!hs.length){er.textContent="בחר לפחות בית אחד לבעל הבית";er.hidden=false;return true}
+    sb().rpc("staff_save",{p_email:em,p_role:ro,p_houses:ro==="owner"?hs:[],p_vendor:ro==="vendor"?document.getElementById("us_v").value:null,p_note:document.getElementById("us_n").value.trim()}).then(function(r){
+      if(r.error){er.textContent="השמירה נכשלה: "+r.error.message;er.hidden=false;return}
+      a.toast("נשמר");US.edit=null;X.tabs.users.form();usLoad();
+    });return true}
   if(act==="rqOk"){var r=RQ.rows.filter(function(x){return x.id===id})[0];if(r)rqConvert(r);return true}
   if(act==="rqNo"){rqSet(id,"rejected");return true}
   if(act==="voucher"){
