@@ -153,6 +153,7 @@ X.dashAlerts=function(el){
 };
 X.badge=function(){
   if(!A().S.ready)return;
+  var co=(A().S.cfg&&A().S.cfg.company||"").trim(),ds=document.querySelector(".side .brand .desc");if(ds&&co&&ds.textContent!==co)ds.textContent=co;
   var n=alertsList().length,b=document.querySelector('#tabs [data-tab="alerts"]');if(!b)return;
   var s=b.querySelector(".bdg");if(!n){if(s)s.remove();return}
   if(!s){s=document.createElement("span");s.className="bdg";b.appendChild(s)}s.textContent=n;

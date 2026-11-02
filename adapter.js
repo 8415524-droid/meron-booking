@@ -71,7 +71,7 @@
   }
   var LOGO='<svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#10161d"/><path d="M8 22 a8 8 0 0 1 16 0Z" fill="#33d6c0"/><path d="M25 22 a6.5 6.5 0 0 1 13 0Z" fill="#1fb8a8"/><rect x="6" y="22" width="36" height="20" fill="#dccaa0"/><path d="M15 42 V32 a9 9 0 0 1 18 0 V42Z" fill="#6b5a43"/><path d="M15 42 V32 a9 9 0 0 1 18 0 V42" fill="none" stroke="#f7f2e4" stroke-width="2.4"/><path d="M20 42 V37 a2 2 0 0 1 4 0 V42Z" fill="#2b6fb8"/><path d="M25 42 V37 a2 2 0 0 1 4 0 V42Z" fill="#e2a24a"/></svg>';
   function loginView(msg){
-    var o=el('<div class="login"><div class="login-art"><div class="login-brand">'+LOGO+'<div><b>כשר מירון</b><small>KASHER MERON</small></div></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p><img class="login-scene" src="scene.svg" alt="" aria-hidden="true"></div>'
+    var o=el('<div class="login"><div class="login-art"><div class="login-brand">'+LOGO+'<div><b>כשר מירון</b><small>KASHER MERON</small><span class="desc">אירוח ונכסים · מירון</span></div></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p><img class="login-scene" src="scene.svg" alt="" aria-hidden="true"></div>'
       +'<div class="login-form"><div class="login-card"><h3>כניסה למערכת</h3><div class="meta">כניסה לצוות בלבד. המשתמשים מוגדרים על ידי המנהל.</div>'
       +'<label>אימייל<input id="lg_e" type="email" autocomplete="username" dir="ltr" style="text-align:right"></label>'
       +'<label id="lg_pw" hidden>סיסמה<input id="lg_p" type="password" autocomplete="current-password" dir="ltr" style="text-align:right"></label>'

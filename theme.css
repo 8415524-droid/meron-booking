@@ -76,3 +76,10 @@ th{background:color-mix(in srgb,var(--bg) 70%,var(--surface))}
 .card{border-radius:22px;box-shadow:var(--shadow)}
 .u{border-radius:18px;transition:transform .15s,border-color .15s}.u:hover{transform:translateY(-2px);border-color:var(--accent)}
 @media print{body{background:#fff!important}.side::before{display:none}}
+
+/* לוגו רשמי: סמל במסגרת, שם בגופן סריף, קו זהב ושורת תיאור */
+.brand svg,.login-brand svg{border-radius:13px;box-shadow:0 0 0 1px rgba(212,162,76,.55),0 6px 18px -6px rgba(0,0,0,.6)}
+.brand b,.login-brand b{font-family:var(--font-display);font-weight:900}
+.brand small,.login-brand small{position:relative;padding-bottom:6px;margin-bottom:5px}
+.brand small::after,.login-brand small::after{content:"";position:absolute;right:0;bottom:0;width:100%;height:1px;background:linear-gradient(270deg,var(--gold),transparent)}
+.brand .desc,.login-brand .desc{display:block;font-size:11.5px;color:#9fb0b8;letter-spacing:.02em}
