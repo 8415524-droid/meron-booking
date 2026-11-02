@@ -62,7 +62,7 @@
     sb.rpc("my_role").then(function(r){
       var role=r.error?"admin":r.data;
       if(!role){sb.auth.signOut().then(function(){document.body.innerHTML="";location.reload()});return}
-      window.MERON_ROLE=role;window.MERON_SB=sb;
+      window.MERON_ROLE=role==="guest"?"viewer":role;window.MERON_SB=sb;
       document.getElementById("appwrap").hidden=false;
       loadScript("extras.js?v=1",function(){loadScript("app.js")});
       var hd=document.getElementById("sidebtns");
@@ -113,10 +113,10 @@
     return;
   }
   /* קישור כניסה ישירה בזמן הבנייה: https://…/#k=<סיסמה>. הסיסמה לא נשמרת בקוד, רק בקישור שמחזיק המנהל. מבטלים בעת ההשקה: מוחקים את המשתמש builder@meron-booking.app. */
-  var km=(location.hash||"").match(/[#&]k=([^&]+)/);
-  if(km){
+  var km=(location.hash||"").match(/[#&]k=([^&]+)/),vm=(location.hash||"").match(/[#&]v=([^&]+)/);
+  if(km||vm){
     history.replaceState(null,"",location.pathname+location.search);
-    sb.auth.signInWithPassword({email:"builder@meron-booking.app",password:decodeURIComponent(km[1])}).then(function(r){
+    sb.auth.signInWithPassword({email:km?"builder@meron-booking.app":"guest@meron-booking.app",password:decodeURIComponent((km||vm)[1])}).then(function(r){
       if(r.error)loginView("קישור הכניסה אינו תקף. היכנס עם אימייל.");else startApp();
     });
     return;
