@@ -964,7 +964,7 @@ function load(){
   }).catch(function(){$("status").textContent="אין גישה למסד הנתונים";S.ready=true;refresh()});
 }
 S.tab=ROLE_HOME[ROLE]||"dash";
-window.MERON_APP={S:S,$:$,esc:esc,money:money,iso:iso,parse:parse,addDays:addDays,nights:nights,nextFriday:nextFriday,fmt:fmt,heb:heb,propById:propById,unitById:unitById,bookables:bookables,commission:commission,commNet:commNet,save:save,del:del,toast:toast,newId:newId,estimate:estimate,extraCosts:extraCosts,STATUS:STATUS,today:today,role:ROLE,go:go,refresh:refresh,overlap:overlap,unitLabel:unitLabel};
+window.MERON_APP={isFree:isFree,openBook:openBookForm,S:S,$:$,esc:esc,money:money,iso:iso,parse:parse,addDays:addDays,nights:nights,nextFriday:nextFriday,fmt:fmt,heb:heb,propById:propById,unitById:unitById,bookables:bookables,commission:commission,commNet:commNet,save:save,del:del,toast:toast,newId:newId,estimate:estimate,extraCosts:extraCosts,STATUS:STATUS,today:today,role:ROLE,go:go,refresh:refresh,overlap:overlap,unitLabel:unitLabel};
 if(ROLE==="viewer")document.body.classList.add("ro");
 renderTabs();mount();
 if(window.claude&&window.claude.use)load();else{$("status").textContent="המערכת פועלת רק בתוך claude.ai";}
