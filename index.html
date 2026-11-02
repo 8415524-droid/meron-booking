@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>כשר מירון</title>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0d2b33"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0d2b33"><link rel="icon" href="favicon.png" type="image/png"><link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&family=Frank+Ruhl+Libre:wght@700;900&display=swap">
 <style>
 html{color-scheme:light}
@@ -28,6 +28,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:
 :root{--side:#0d2b33;--side-ink:#cfe0e4;--side-mute:#7f9aa2;--gold:#d4a24c;--shadow:0 1px 2px rgba(13,43,51,.06),0 6px 20px rgba(13,43,51,.06)}
 .app{display:flex;min-height:100vh}
 .side{width:244px;flex:none;background:linear-gradient(180deg,#0d2b33 0%,#0a2027 100%);color:var(--side-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:30}
+.logo-tile{height:44px;width:auto;max-width:96px;border-radius:12px;background:#fff;object-fit:contain;padding:3px;flex:none}.logo-full{width:min(340px,84%);height:auto;background:#fff;border-radius:18px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
 .brand{display:flex;align-items:center;gap:11px;padding:22px 20px 18px}
 .brand svg{flex:none}
 .brand b{display:block;font-family:var(--font-display);font-size:21px;font-weight:900;color:#fff;line-height:1.1}
@@ -141,7 +142,7 @@ body.ro .topbar::after{content:'צפייה בלבד';font-size:12px;font-weight:
 <body>
 <div class="app" id="appwrap" hidden>
   <aside class="side" id="side">
-    <div class="brand"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#10161d"/><path d="M10.5 18 a8.5 8.5 0 0 1 17 0Z" fill="#33d6c0"/><path d="M25 18 a6.5 6.5 0 0 1 13 0Z" fill="#1fb8a8"/><rect x="9" y="20.5" width="30" height="2" rx="1" fill="#f1e8d0"/><path d="M15.5 41 V32.5 a8.5 8.5 0 0 1 17 0 V41" fill="none" stroke="#f1e8d0" stroke-width="2.8"/><path d="M21 41 V36 a3 3 0 0 1 6 0 V41Z" fill="#d4a24c"/></svg>
+    <div class="brand"><img class="logo-tile" src="logo-mark.png" alt="">
 <div><b>כשר מירון</b><small>KASHER MERON</small><span class="desc">אירוח ונכסים · מירון</span></div></div>
     <nav role="tablist" id="tabs" aria-label="תפריט ראשי"></nav>
     <div class="sidefoot"><span class="sub" id="status">טוען נתונים…</span><div id="sidebtns"></div></div>

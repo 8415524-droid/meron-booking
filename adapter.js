@@ -69,9 +69,9 @@
       if(hd){var b=document.createElement("button");b.className="btn sm";b.style.width="100%";b.textContent="יציאה";b.onclick=function(){sb.auth.signOut().then(function(){location.reload()})};hd.appendChild(b)}
     });
   }
-  var LOGO='<svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#10161d"/><path d="M10.5 18 a8.5 8.5 0 0 1 17 0Z" fill="#33d6c0"/><path d="M25 18 a6.5 6.5 0 0 1 13 0Z" fill="#1fb8a8"/><rect x="9" y="20.5" width="30" height="2" rx="1" fill="#f1e8d0"/><path d="M15.5 41 V32.5 a8.5 8.5 0 0 1 17 0 V41" fill="none" stroke="#f1e8d0" stroke-width="2.8"/><path d="M21 41 V36 a3 3 0 0 1 6 0 V41Z" fill="#d4a24c"/></svg>';
+  var LOGO='<img class="logo-tile" src="logo-mark.png" alt="">';
   function loginView(msg){
-    var o=el('<div class="login"><div class="login-art"><div class="login-brand">'+LOGO+'<div><b>כשר מירון</b><small>KASHER MERON</small><span class="desc">אירוח ונכסים · מירון</span></div></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p><img class="login-scene" src="scene.svg" alt="" aria-hidden="true"></div>'
+    var o=el('<div class="login"><div class="login-art"><div class="login-brand"><img class="logo-full" src="logo-full.png" alt="כשר מירון"></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p></div>'
       +'<div class="login-form"><div class="login-card"><h3>כניסה למערכת</h3><div class="meta">כניסה לצוות בלבד. המשתמשים מוגדרים על ידי המנהל.</div>'
       +'<label>אימייל<input id="lg_e" type="email" autocomplete="username" dir="ltr" style="text-align:right"></label>'
       +'<label id="lg_pw" hidden>סיסמה<input id="lg_p" type="password" autocomplete="current-password" dir="ltr" style="text-align:right"></label>'

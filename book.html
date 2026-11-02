@@ -12,7 +12,7 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 'Heebo',system-ui,sans-serif}
 .hero{position:relative;overflow:hidden;color:#dbe9ec;padding:26px 20px 190px;background:linear-gradient(rgba(7,26,32,.5),rgba(7,26,32,.5)),url(rashbi.jpg) center/cover,radial-gradient(900px 400px at 75% 0,#1d5260,transparent 60%),linear-gradient(160deg,#0d2b33,#071a20)}
 .hero .in{max-width:880px;margin:0 auto;position:relative;z-index:1}
-.brand{display:flex;gap:12px;align-items:center;margin-bottom:26px}.brand svg{flex:none;width:44px;height:44px}
+.logo-full{width:min(300px,80%);height:auto;background:#fff;border-radius:16px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}.logo-tile{height:48px;width:auto;border-radius:12px;background:#fff;object-fit:contain;padding:3px;flex:none}.brand{display:flex;gap:12px;align-items:center;margin-bottom:26px}.brand svg{flex:none;width:44px;height:44px}
 .brand b{display:block;font:900 24px var(--fd);color:#fff;line-height:1.1}.brand small{display:block;font-size:11px;letter-spacing:.16em;color:var(--gold)}
 .hero h1{font:900 clamp(28px,6vw,44px)/1.2 var(--fd);color:#fff;margin:0 0 10px}.hero p{margin:0;max-width:520px;color:#a9c3c9;font-size:16px}
 .scene{position:absolute;left:0;right:0;bottom:0;width:100%;height:170px;pointer-events:none}
@@ -38,9 +38,8 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:0 16px 30px}
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
-<header class="hero"><div class="in"><div class="brand"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#10161d"/><path d="M10.5 18 a8.5 8.5 0 0 1 17 0Z" fill="#33d6c0"/><path d="M25 18 a6.5 6.5 0 0 1 13 0Z" fill="#1fb8a8"/><rect x="9" y="20.5" width="30" height="2" rx="1" fill="#f1e8d0"/><path d="M15.5 41 V32.5 a8.5 8.5 0 0 1 17 0 V41" fill="none" stroke="#f1e8d0" stroke-width="2.8"/><path d="M21 41 V36 a3 3 0 0 1 6 0 V41Z" fill="#d4a24c"/></svg>
-<div><b>כשר מירון</b><small>KASHER MERON</small><span class="desc">אירוח ונכסים · מירון</span></div></div>
-<h1>אירוח כשר במירון, לשבת ולכל ימות השנה</h1><p>בדוק זמינות, בחר דירה והשאר פרטים. נציג יחזור אליך לאישור.</p></div><img class="scene" src="scene.svg" alt="" aria-hidden="true"></header>
+<header class="hero"><div class="in"><div class="brand"><img class="logo-full" src="logo-full.png" alt="כשר מירון"></div>
+<h1>אירוח כשר במירון, לשבת ולכל ימות השנה</h1><p>בדוק זמינות, בחר דירה והשאר פרטים. נציג יחזור אליך לאישור.</p></div></header>
 <main>
 <div class="card"><div class="grid">
 <label>כניסה<input type="date" id="ci"></label><label>יציאה<input type="date" id="co"></label>
