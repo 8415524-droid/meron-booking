@@ -200,7 +200,7 @@ function drawPropForm(){
    +'<label>מסלול<select id="f_mode"><option value="regular"'+(p.mode==="regular"?' selected':'')+'>רגיל</option><option value="exclusive"'+(p.mode==="exclusive"?' selected':'')+'>בלעדי</option></select></label>'
    +'<label>עמלה באחוזים<input id="f_pct" type="number" min="0" max="100" step="0.5" value="'+p.pct+'"></label>'
    +'<label>עלות ניקיון ליציאה (₪)<input id="f_cc" type="number" min="0" value="'+(p.cleanCost||0)+'"></label>'
-   +'</div><label>הערות (קרבה לציון, מזגן, מגבות)<textarea id="f_notes">'+esc(p.notes)+'</textarea></label>'
+   +'</div><div id="p_feat">'+window.MERON_FEAT.html(p.feat)+'</div><label>הערות (קרבה לציון, מזגן, מגבות)<textarea id="f_notes">'+esc(p.notes)+'</textarea></label>'
    +'<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="f_act" style="width:auto"'+(p.active!==false?' checked':'')+'> פעיל להזמנות</label>'
    +'<div class="row"><button class="btn primary" data-act="saveProp">'+(S.editId?'שמור שינויים':'הוסף נכס')+'</button>'+(S.editId?'<button class="btn" data-act="cancelEdit">בטל עריכה</button>':'')+'</div>';
 }
@@ -210,7 +210,7 @@ function updProps(){updUnits();
   $("p_list").innerHTML=S.props.map(function(p){
     var cnt=S.bookings.filter(function(b){return b.propId===p.id&&b.status!=="cancelled"}).length;
     return '<div class="opt"><div class="info"><h3>'+esc(p.name)+(p.active===false?' <span class="pill bad">לא פעיל</span>':'')+'</h3>'
-     +'<div class="meta">'+esc(p.area||"")+' · '+p.beds+' מיטות · '+money(p.price)+' ללילה · חבילת שבת '+money(p.shabbatPrice)+'</div>'
+     +'<div class="meta">'+esc(p.area||"")+' · '+p.beds+' מיטות · '+money(p.price)+' ללילה · חבילת שבת '+money(p.shabbatPrice)+'</div>'+(p.feat&&window.MERON_FEAT.text(p.feat)?'<div class="meta">'+esc(window.MERON_FEAT.text(p.feat))+'</div>':'')
      +'<div class="meta">בעלים: '+esc(p.owner||"לא הוזן")+' <span dir="ltr">'+esc(p.ownerPhone||"")+'</span> · '+(p.mode==="exclusive"?'בלעדי':'רגיל')+' · עמלה '+p.pct+'% · '+cnt+' הזמנות</div></div>'
      +'<div class="row"><button class="btn sm" data-act="editProp" data-id="'+p.id+'">ערוך</button>'
      +(S.confirmDel===p.id?'<button class="btn danger sm" data-act="delP" data-id="'+p.id+'">מחק סופית</button><button class="btn sm" data-act="noDel">השאר</button>':'<button class="btn sm" data-act="askDel" data-id="'+p.id+'">מחק</button>')
@@ -283,7 +283,7 @@ function act(a,id,el){
     var pct=+val("f_pct");if(!(pct>=0&&pct<=100)){toast("אחוז עמלה לא תקין");return}
     var pid=S.editId||newId("properties");
     var data={name:name2,area:val("f_area").trim(),beds:+val("f_beds")||1,rooms:+val("f_rooms")||1,price:+val("f_price")||0,shabbatPrice:+val("f_sp")||0,
-      owner:val("f_owner").trim(),ownerPhone:val("f_op").trim(),mode:val("f_mode"),pct:pct,cleanCost:+val("f_cc")||0,notes:val("f_notes").trim(),active:$("f_act").checked};
+      owner:val("f_owner").trim(),ownerPhone:val("f_op").trim(),mode:val("f_mode"),pct:pct,cleanCost:+val("f_cc")||0,notes:val("f_notes").trim(),feat:window.MERON_FEAT.read($("p_feat")),active:$("f_act").checked};
     save("properties",pid,data,S.editId?"הנכס עודכן":"הנכס נוסף").then(function(){S.editId=null;drawPropForm()});
     return;
   }
@@ -632,14 +632,14 @@ function updUnits(){
     box.innerHTML='<div><h2>יחידות השכרה בבית</h2><div class="meta">בית אירוח יכול לכלול כמה יחידות (דירה, סטודיו, חדר), ולכל אחת מחיר, מיטות ויומן זמינות משלה. בית בלי יחידות מוגדרות נחשב יחידה אחת.</div></div>'
      +'<div class="grid2"><label>בית<select id="u_house"></select></label><label>שם היחידה<input id="u_name" placeholder="לדוגמה: יחידה קומה א"></label>'
      +'<label>מיטות<input id="u_beds" type="number" min="1" value="4"></label><label>חדרים<input id="u_rooms" type="number" min="1" value="2"></label>'
-     +'<label>מחיר ללילה (₪)<input id="u_price" type="number" min="0" value="700"></label><label>חבילת שבת (₪)<input id="u_sp" type="number" min="0" value="1800"></label></div>'
+     +'<label>מחיר ללילה (₪)<input id="u_price" type="number" min="0" value="700"></label><label>חבילת שבת (₪)<input id="u_sp" type="number" min="0" value="1800"></label></div><div id="u_feat">'+window.MERON_FEAT.html({})+'</div>'
      +'<div class="row"><button class="btn primary" data-act="addUnit">הוסף יחידה</button></div><div class="list" id="u_list"></div>';
   }
   fillHouses("u_house");
   var rows=S.props.map(function(h){
     var us=S.units.filter(function(u){return u.houseId===h.id});
     if(!us.length)return '';
-    return '<div class="stack"><h3>'+esc(h.name)+'</h3>'+us.map(function(u){return '<div class="opt"><div class="info"><b>'+esc(u.name)+'</b><div class="meta">'+u.beds+' מיטות · '+u.rooms+' חדרים · '+money(u.price)+' ללילה · חבילת שבת '+money(u.shabbatPrice)+'</div></div><div class="row">'+delBtn("delUnit",u.id)+'</div></div>'}).join("")+'</div>';
+    return '<div class="stack"><h3>'+esc(h.name)+'</h3>'+us.map(function(u){return '<div class="opt"><div class="info"><b>'+esc(u.name)+'</b><div class="meta">'+u.beds+' מיטות · '+u.rooms+' חדרים · '+money(u.price)+' ללילה · חבילת שבת '+money(u.shabbatPrice)+'</div>'+(u.feat&&window.MERON_FEAT.text(u.feat)?'<div class="meta">'+esc(window.MERON_FEAT.text(u.feat))+'</div>':'')+'</div><div class="row">'+delBtn("delUnit",u.id)+'</div></div>'}).join("")+'</div>';
   }).join("");
   $("u_list").innerHTML=rows||'<div class="meta">עדיין אין יחידות נפרדות. כל בית מוצג כיחידה אחת.</div>';
 }
@@ -894,7 +894,7 @@ function actY(a,id,el){
   if(a==="lead"){var nm=val("l_name").trim(),ph=val("l_phone").trim();if(!nm||!ph){toast("חסר שם או טלפון");return true}
     save("leads",newId("leads"),{name:nm,phone:ph,from:val("i_in"),to:val("i_out"),guests:+val("i_g")||1,date:today()},"נרשם ברשימת המתנה");$("l_name").value="";$("l_phone").value="";return true}
   if(a==="addUnit"){var hn=val("u_house"),un=val("u_name").trim();if(!hn||!un){toast("בחר בית והזן שם ליחידה");return true}
-    save("units",newId("units"),{houseId:hn,name:un,beds:+val("u_beds")||1,rooms:+val("u_rooms")||1,price:+val("u_price")||0,shabbatPrice:+val("u_sp")||0,active:true},"היחידה נוספה");$("u_name").value="";return true}
+    save("units",newId("units"),{houseId:hn,name:un,beds:+val("u_beds")||1,rooms:+val("u_rooms")||1,price:+val("u_price")||0,shabbatPrice:+val("u_sp")||0,feat:window.MERON_FEAT.read($("u_feat")),active:true},"היחידה נוספה");$("u_name").value="";return true}
   if(a==="delUnit"){S.confirmDel=null;
     if(S.bookings.some(function(x){return bUnit(x)===id&&x.status!=="cancelled"&&x.status!=="done"})){toast("יש הזמנות פעילות ביחידה");refresh();return true}
     del("units",id);return true}

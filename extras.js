@@ -5,6 +5,22 @@ var X=window.MERON_X={tabs:{}};
 function A(){return window.MERON_APP}
 function sb(){return window.MERON_SB}
 function esc(s){return A().esc(s)}
+
+/* ---- מאפייני דירה: מקלחות, שירותים, גינה, חצר ועוד (משותף לטפסים) ---- */
+var FEAT=window.MERON_FEAT={
+  counts:[["baths","מקלחות"],["toilets","שירותים"],["floor","קומה"],["sofas","ספות נפתחות"],["cribs","מיטות תינוק"],["parking","חניות"]],
+  flags:[["garden","גינה"],["yard","חצר"],["balcony","מרפסת"],["sukka","מרפסת סוכה"],["ac","מזגן"],["heating","חימום"],["kitchen","מטבח מאובזר"],["plata","פלטה לשבת"],["fridge","מקרר גדול"],["washer","מכונת כביסה"],["linens","מצעים ומגבות"],["wifi","אינטרנט"],["elevator","מעלית"],["accessible","נגיש, בלי מדרגות"],["shelter","ממ״ד או מקלט"],["bbq","פינת מנגל"],["crib","מיטת תינוק זמינה"],["entrance","כניסה פרטית"]],
+  html:function(f){f=f||{};var fl=f.flags||[];
+    return '<details class="feat" style="grid-column:1/-1"><summary style="cursor:pointer;font-weight:600;color:var(--accent)">פרטים נוספים: מקלחות, שירותים, גינה, חצר ועוד</summary>'
+     +'<div class="grid2" style="margin-top:8px">'+FEAT.counts.map(function(c){return '<label>'+c[1]+'<input class="f-n" data-k="'+c[0]+'" type="number" min="0" inputmode="numeric" value="'+(f[c[0]]===undefined||f[c[0]]===null?"":f[c[0]])+'"></label>'}).join("")+'</div>'
+     +'<div class="featflags" style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px">'+FEAT.flags.map(function(c){return '<label style="flex-direction:row;align-items:center;gap:6px;font-size:13.5px;color:var(--ink)"><input class="f-f" type="checkbox" data-k="'+c[0]+'"'+(fl.indexOf(c[0])>-1?' checked':'')+' style="width:auto"> '+c[1]+'</label>'}).join("")+'</div></details>'},
+  read:function(root){var o={flags:[]};
+    [].slice.call(root.querySelectorAll(".f-n")).forEach(function(i){if(i.value!=="")o[i.dataset.k]=+i.value||0});
+    [].slice.call(root.querySelectorAll(".f-f")).forEach(function(i){if(i.checked)o.flags.push(i.dataset.k)});return o},
+  text:function(f){if(!f)return "";var p=[];
+    FEAT.counts.forEach(function(c){if(f[c[0]]){p.push(f[c[0]]+" "+c[1])}});
+    (f.flags||[]).forEach(function(k){FEAT.flags.forEach(function(c){if(c[0]===k)p.push(c[1])})});return p.join(" · ")}
+};
 function wa(phone,text){
   var d=String(phone||"").replace(/\D/g,"");if(!d)return "";
   if(d.charAt(0)==="0")d="972"+d.slice(1);
@@ -184,7 +200,7 @@ X.tabs.forecast={
 
 /* ---- בעלי נכסים: רשימה והוספה מהירה ---- */
 X.own={owner:"",phone:""};
-function urow(v){v=v||{};return '<div class="urow grid2" style="align-items:end;border-top:1px solid var(--line);padding-top:8px"><label>שם יחידה<input class="u-name" value="'+esc(v.name||"")+'" placeholder="לדוגמה: דירה 1"></label><label>מיטות<input class="u-beds" type="number" min="1" value="'+(v.beds||"")+'" inputmode="numeric"></label><label>חדרים<input class="u-rooms" type="number" min="1" value="'+(v.rooms||"")+'" inputmode="numeric"></label><label>מחיר ללילה<input class="u-price" type="number" min="0" value="'+(v.price||"")+'" inputmode="numeric"></label><label>חבילת שבת<input class="u-sp" type="number" min="0" value="'+(v.sp||"")+'" inputmode="numeric"></label><button type="button" class="btn sm danger" data-act="owDelRow">הסר</button></div>'}
+function urow(v){v=v||{};return '<div class="urow grid2" style="align-items:end;border-top:1px solid var(--line);padding-top:8px"><label>שם יחידה<input class="u-name" value="'+esc(v.name||"")+'" placeholder="לדוגמה: דירה 1"></label><label>מיטות<input class="u-beds" type="number" min="1" value="'+(v.beds||"")+'" inputmode="numeric"></label><label>חדרים<input class="u-rooms" type="number" min="1" value="'+(v.rooms||"")+'" inputmode="numeric"></label><label>מחיר ללילה<input class="u-price" type="number" min="0" value="'+(v.price||"")+'" inputmode="numeric"></label><label>חבילת שבת<input class="u-sp" type="number" min="0" value="'+(v.sp||"")+'" inputmode="numeric"></label>'+FEAT.html(v.feat)+'<button type="button" class="btn sm danger" data-act="owDelRow">הסר</button></div>'}
 function ownersData(){
   var a=A(),m={};
   a.S.props.forEach(function(p){var k=p.owner||"ללא בעלים";var o=m[k]||(m[k]={name:k,phone:p.ownerPhone||"",houses:[]});if(!o.phone&&p.ownerPhone)o.phone=p.ownerPhone;o.houses.push(p)});
@@ -228,16 +244,16 @@ function owSave(more){
   function bad(t){err.textContent=t;err.hidden=false}
   var owner=$("ow_n").value.trim(),phone=$("ow_p").value.trim(),hn=$("ow_h").value.trim();
   if(!owner)return bad("חסר שם בעל הנכס");if(!hn)return bad("חסר שם הבית");
-  var rows=[].slice.call(document.querySelectorAll("#ow_units .urow")).map(function(r){var g=function(c){return r.querySelector(c).value.trim()};return {name:g(".u-name"),beds:+g(".u-beds")||0,rooms:+g(".u-rooms")||0,price:+g(".u-price")||0,sp:+g(".u-sp")||0}});
+  var rows=[].slice.call(document.querySelectorAll("#ow_units .urow")).map(function(r){var g=function(c){return r.querySelector(c).value.trim()};return {name:g(".u-name"),beds:+g(".u-beds")||0,rooms:+g(".u-rooms")||0,price:+g(".u-price")||0,sp:+g(".u-sp")||0,feat:FEAT.read(r)}});
   var named=rows.filter(function(r){return r.name});
   if(rows.length>1&&named.length!==rows.length)return bad("בכל יחידה צריך שם, כשיש יותר מיחידה אחת");
   var base=rows[0]||{};
   var beds=rows.reduce(function(s,r){return s+r.beds},0)||1,rooms=rows.reduce(function(s,r){return s+r.rooms},0)||1;
   var hid=a.newId("properties");
-  var house={name:hn,area:$("ow_a").value.trim(),beds:beds,rooms:rooms,price:base.price||0,shabbatPrice:base.sp||0,owner:owner,ownerPhone:phone,mode:$("ow_m").value,pct:+$("ow_c").value||0,cleanCost:+$("ow_cl").value||0,notes:"",active:true};
+  var house={name:hn,area:$("ow_a").value.trim(),beds:beds,rooms:rooms,price:base.price||0,shabbatPrice:base.sp||0,feat:base.feat||{flags:[]},owner:owner,ownerPhone:phone,mode:$("ow_m").value,pct:+$("ow_c").value||0,cleanCost:+$("ow_cl").value||0,notes:"",active:true};
   err.hidden=true;
   var jobs=[a.save("properties",hid,house)];
-  if(named.length)named.forEach(function(r){jobs.push(a.save("units",a.newId("units"),{houseId:hid,name:r.name,beds:r.beds||1,rooms:r.rooms||1,price:r.price,shabbatPrice:r.sp,active:true}))});
+  if(named.length)named.forEach(function(r){jobs.push(a.save("units",a.newId("units"),{houseId:hid,name:r.name,beds:r.beds||1,rooms:r.rooms||1,price:r.price,shabbatPrice:r.sp,feat:r.feat,active:true}))});
   Promise.all(jobs).then(function(){
     X.own={owner:owner,phone:phone};
     a.toast("נשמר: "+hn+(named.length?" ("+named.length+" יחידות)":""));
@@ -301,7 +317,7 @@ X.tabs.backup={
 /* ---- פעולות ---- */
 X.act=function(act,id,el){
   var a=A();
-  if(act==="owAddRow"){var c=document.getElementById("ow_units"),last=c.querySelector(".urow:last-child");var v={};if(last){v={beds:last.querySelector(".u-beds").value,rooms:last.querySelector(".u-rooms").value,price:last.querySelector(".u-price").value,sp:last.querySelector(".u-sp").value}}c.insertAdjacentHTML("beforeend",urow(v));var n=c.querySelectorAll(".u-name");n[n.length-1].focus();return true}
+  if(act==="owAddRow"){var c=document.getElementById("ow_units"),last=c.querySelector(".urow:last-child");var v={};if(last){v={beds:last.querySelector(".u-beds").value,rooms:last.querySelector(".u-rooms").value,price:last.querySelector(".u-price").value,sp:last.querySelector(".u-sp").value,feat:FEAT.read(last)}}c.insertAdjacentHTML("beforeend",urow(v));var n=c.querySelectorAll(".u-name");n[n.length-1].focus();return true}
   if(act==="owDelRow"){var r=el.closest(".urow");if(document.querySelectorAll("#ow_units .urow").length>1)r.remove();return true}
   if(act==="owSave"){owSave(false);return true}
   if(act==="owSaveMore"){owSave(true);return true}
