@@ -57,11 +57,17 @@
 
   /* ---- כניסה ---- */
   function el(h){var d=document.createElement("div");d.innerHTML=h;return d.firstChild}
+  function loadScript(src,cb){var s=document.createElement("script");s.src=src;s.onload=cb;document.body.appendChild(s)}
   function startApp(){
-    document.getElementById("appwrap").hidden=false;
-    var s=document.createElement("script");s.src="app.js";document.body.appendChild(s);
-    var hd=document.getElementById("sidebtns");
-    if(hd&&sb){var b=document.createElement("button");b.className="btn sm";b.style.width="100%";b.textContent="יציאה";b.onclick=function(){sb.auth.signOut().then(function(){location.reload()})};hd.appendChild(b)}
+    sb.rpc("my_role").then(function(r){
+      var role=r.error?"admin":r.data;
+      if(!role){sb.auth.signOut().then(function(){document.body.innerHTML="";location.reload()});return}
+      window.MERON_ROLE=role;window.MERON_SB=sb;
+      document.getElementById("appwrap").hidden=false;
+      loadScript("extras.js?v=1",function(){loadScript("app.js")});
+      var hd=document.getElementById("sidebtns");
+      if(hd){var b=document.createElement("button");b.className="btn sm";b.style.width="100%";b.textContent="יציאה";b.onclick=function(){sb.auth.signOut().then(function(){location.reload()})};hd.appendChild(b)}
+    });
   }
   var LOGO='<svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#123b45"/><path d="M2 40 L15 20 L24 31 L34 17 L46 40 Z" fill="#1d5260"/><rect x="8" y="30" width="32" height="10" fill="#f4f1e8"/><path d="M15 30 a9 9 0 0 1 18 0 Z" fill="#3b82d6"/><path d="M8 30 a4 4 0 0 1 8 0 Z" fill="#3b82d6"/><path d="M32 30 a4 4 0 0 1 8 0 Z" fill="#3b82d6"/><path d="M24 21 V16" stroke="#d9a84e" stroke-width="1.6" stroke-linecap="round"/><path d="M21.5 40 v-5 a2.5 2.5 0 0 1 5 0 v5 Z" fill="#123b45"/><rect x="11" y="33" width="3" height="4" rx="1.5" fill="#3b82d6"/><rect x="34" y="33" width="3" height="4" rx="1.5" fill="#3b82d6"/></svg>';
   function loginView(msg){

@@ -1,5 +1,5 @@
 (function(){
-var TABS=[["dash","דשבורד"],["intake","הזמנה חדשה"],["bookings","הזמנות"],["cal","יומן שבתות"],["month","תפוסה חודשית"],["props","בתים ויחידות"],["price","מחירון"],["ads","פרסום"],["ops","תחזוקה וניקיון"],["bills","חשבונות נכס"],["inv","חשבוניות"],["exp","הוצאות"],["pay","משכורות"],["ledger","הנהלת חשבונות"],["pl","רווח והפסד"],["fin","התחשבנות"]];
+var TABS=[["dash","דשבורד"],["intake","הזמנה חדשה"],["bookings","הזמנות"],["cal","יומן שבתות"],["month","תפוסה חודשית"],["props","בתים ויחידות"],["price","מחירון"],["ads","פרסום"],["ops","תחזוקה וניקיון"],["bills","חשבונות נכס"],["inv","חשבוניות"],["exp","הוצאות"],["pay","משכורות"],["ledger","הנהלת חשבונות"],["pl","רווח והפסד"],["fin","התחשבנות"],["requests","בקשות מהאתר"],["search","חיפוש לקוח"],["report","דוח לבעל בית"],["alerts","התראות"],["forecast","תחזית שבתות"],["backup","גיבוי"]];
 var CATS=["שיווק ופרסום","תוכנה ומערכות","טלפוניה","משרד ושכירות","נסיעות","ייעוץ מקצועי","עמלות סליקה","ביטוח","שונות"];
 var STATUS={pending:["ממתין לאישור","warn"],confirmed:["מאושר","ok"],in:["נכנסו","ok"],done:["הסתיים",""],cancelled:["בוטל","bad"]};
 var NEXT={pending:"confirmed",confirmed:"in","in":"done"};
@@ -42,13 +42,18 @@ function del(col,id){return S.db.collection(col).doc(id).delete().then(function(
 function newId(col){return S.db.collection(col).doc().id}
 
 /* ---------- shell ---------- */
-var GROUPS=[["הזמנות","book",["dash","intake","bookings","cal","month"]],["נכסים ושיווק","home",["props","price","ads"]],["תפעול","tool",["ops","bills"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin"]]];
+var ROLE=window.MERON_ROLE||"admin";
+var ROLE_TABS={agent:["requests","intake","bookings","search","cal","month","props","alerts"],owner:["bookings","cal","report"],vendor:["ops"],partner:["dash","bookings","forecast","pl","fin","ledger"]};
+var ROLE_HOME={admin:"dash",agent:"intake",owner:"bookings",vendor:"ops",partner:"dash"};
+function tabAllowed(k){return ROLE==="admin"||(ROLE_TABS[ROLE]||[]).indexOf(k)>=0}
+var GROUPS=[["הזמנות","book",["dash","requests","intake","bookings","search","cal","month","forecast"]],["נכסים ושיווק","home",["props","price","ads"]],["תפעול","tool",["ops","bills","alerts"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin","report"]],["מערכת","tool",["backup"]]];
 var GICON={'book': '<path d="M4 5h16v14H4zM4 10h16M9 5v14"/>', 'home': '<path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6"/>', 'tool': '<path d="M14 6a4 4 0 005 5l-9 9-3-3 9-9a4 4 0 00-2-2z"/>', 'coin': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10c0-2 6-2 6 0s-6 2-6 4 6 2 6 0"/>'};
 function renderTabs(){
   var names={};TABS.forEach(function(t){names[t[0]]=t[1]});
   $("tabs").innerHTML=GROUPS.map(function(g){
+    var ks=g[2].filter(tabAllowed);if(!ks.length)return "";
     return '<div class="grp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+GICON[g[1]]+'</svg>'+g[0]+'</div>'+
-      g[2].map(function(k){return '<button role="tab" data-tab="'+k+'" aria-selected="'+(S.tab===k)+'">'+names[k]+'</button>'}).join("");
+      ks.map(function(k){return '<button role="tab" data-tab="'+k+'" aria-selected="'+(S.tab===k)+'">'+names[k]+'</button>'}).join("");
   }).join("");
   var pt=$("pagetitle");if(pt)pt.textContent=names[S.tab]||"";
   document.body.classList.remove("menu-open");
@@ -58,10 +63,11 @@ document.addEventListener("click",function(e){
   if(e.target.closest("#menubtn")){document.body.classList.toggle("menu-open");return}
   if(e.target.id==="scrim"){document.body.classList.remove("menu-open");return}
   var t=e.target.closest("[data-tab]");if(t){go(t.dataset.tab);return}
-  var a=e.target.closest("[data-act]");if(a)act(a.dataset.act,a.dataset.id,a);
+  var a=e.target.closest("[data-act]");if(a){if(window.MERON_X&&MERON_X.act&&MERON_X.act(a.dataset.act,a.dataset.id,a))return;act(a.dataset.act,a.dataset.id,a)}
 });
 function mount(){
   var v=$("view");
+  if(window.MERON_X&&MERON_X.tabs&&MERON_X.tabs[S.tab]){MERON_X.tabs[S.tab].mount(v);return}
   if(S.tab==="dash")mountDash(v);
   else if(S.tab==="month")mountMonth(v);
   else if(S.tab==="ads")mountAds(v);
@@ -81,6 +87,7 @@ function mount(){
 }
 function refresh(){
   $("status").textContent=S.ready?(S.props.length+" נכסים · "+S.bookings.filter(function(b){return b.status!=="cancelled"}).length+" הזמנות פעילות"):"טוען נתונים…";
+  if(window.MERON_X&&MERON_X.tabs&&MERON_X.tabs[S.tab]){if(MERON_X.tabs[S.tab].upd)MERON_X.tabs[S.tab].upd();if(MERON_X.badge)MERON_X.badge();return}
   if(S.tab==="dash")updDash();
   else if(S.tab==="month")updMonth();
   else if(S.tab==="ads")updAds();
@@ -935,7 +942,7 @@ function load(){
     },function(e){$("status").textContent="שגיאה בטעינת הזמנות";});
     function sub(col,key,map){
       db.collection(col).onSnapshot(function(s){S[key]=s.docs.map(function(d){var r=d.data();return map?map(d,r):Object.assign({id:d.id,raw:r},r)});refresh()},
-        function(){$("status").textContent="שגיאה בטעינת "+col});
+        function(){if(ROLE==="admin")$("status").textContent="שגיאה בטעינת "+col});
     }
     sub("employees","emps");sub("payroll","payroll");sub("expenses","expenses");sub("invoices","invoices");sub("seasons","seasons");sub("units","units");sub("ads","ads");sub("leads","leads");sub("tasks","tasks");sub("bills","bills");sub("cleans","cleans");
     db.doc("settings/main").onSnapshot(function(s){
@@ -949,6 +956,8 @@ function load(){
     },function(){});
   }).catch(function(){$("status").textContent="אין גישה למסד הנתונים";S.ready=true;refresh()});
 }
+S.tab=ROLE_HOME[ROLE]||"dash";
+window.MERON_APP={S:S,$:$,esc:esc,money:money,iso:iso,parse:parse,addDays:addDays,nights:nights,nextFriday:nextFriday,fmt:fmt,heb:heb,propById:propById,unitById:unitById,bookables:bookables,commission:commission,commNet:commNet,save:save,del:del,toast:toast,newId:newId,estimate:estimate,extraCosts:extraCosts,STATUS:STATUS,today:today,role:ROLE,go:go,refresh:refresh,overlap:overlap,unitLabel:unitLabel};
 renderTabs();mount();
 if(window.claude&&window.claude.use)load();else{$("status").textContent="המערכת פועלת רק בתוך claude.ai";}
 })();

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>כשר מירון · הזמנת אירוח</title>
+<meta name="description" content="אירוח כשר במירון. בדיקת זמינות ובקשת הזמנה לשבתות וסופי שבוע.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Frank+Ruhl+Libre:wght@700;900&display=swap">
+<style>
+:root{--bg:#eef1f2;--surface:#fff;--ink:#15222b;--muted:#5b6b75;--line:#d5dde1;--accent:#0e6a6a;--accent-soft:#d9eeee;--ok:#1f7a3d;--ok-soft:#dcf1e3;--bad:#a3262a;--bad-soft:#f8dcdd;--gold:#d4a24c;--shadow:0 1px 2px rgba(13,43,51,.06),0 6px 20px rgba(13,43,51,.08);--fd:'Frank Ruhl Libre','Heebo',serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0f181d;--surface:#17232a;--ink:#e6eef1;--muted:#93a5af;--line:#2a3b44;--accent:#4fc3c3;--accent-soft:#16393a;--ok:#6fd08c;--ok-soft:#173a25;--bad:#ff8a8d;--bad-soft:#41191b;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 'Heebo',system-ui,sans-serif}
+.hero{position:relative;overflow:hidden;color:#dbe9ec;padding:26px 20px 190px;background:linear-gradient(rgba(7,26,32,.5),rgba(7,26,32,.5)),url(rashbi.jpg) center/cover,radial-gradient(900px 400px at 75% 0,#1d5260,transparent 60%),linear-gradient(160deg,#0d2b33,#071a20)}
+.hero .in{max-width:880px;margin:0 auto;position:relative;z-index:1}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:26px}.brand svg{flex:none;width:44px;height:44px}
+.brand b{display:block;font:900 24px var(--fd);color:#fff;line-height:1.1}.brand small{display:block;font-size:11px;letter-spacing:.16em;color:var(--gold)}
+.hero h1{font:900 clamp(28px,6vw,44px)/1.2 var(--fd);color:#fff;margin:0 0 10px}.hero p{margin:0;max-width:520px;color:#a9c3c9;font-size:16px}
+.scene{position:absolute;left:0;right:0;bottom:0;width:100%;height:170px;pointer-events:none}
+main{max-width:880px;margin:-90px auto 40px;padding:0 16px;position:relative;z-index:2}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input,textarea{font:400 16px 'Heebo',sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+input:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.btn{font:700 15px 'Heebo',sans-serif;border:0;border-radius:10px;padding:12px 18px;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(14,106,106,.3)}
+.btn:disabled{opacity:.6}
+.res{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.u{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--surface)}
+.u h3{margin:0;font-size:17px}.meta{color:var(--muted);font-size:13px}.price{font:900 22px var(--fd)}
+.note{padding:12px 14px;border-radius:10px;background:var(--ok-soft);color:var(--ok);font-weight:500}
+.err{padding:12px 14px;border-radius:10px;background:var(--bad-soft);color:var(--bad)}
+.modal{position:fixed;inset:0;background:rgba(5,15,18,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal .card{width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px;max-height:92vh;overflow:auto}
+.hp{position:absolute;left:-9999px}
+[hidden]{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 16px 30px}
+</style>
+</head>
+<body>
+<header class="hero"><div class="in"><div class="brand"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#123b45"/><path d="M2 40 L15 20 L24 31 L34 17 L46 40 Z" fill="#1d5260"/><rect x="8" y="30" width="32" height="10" fill="#f4f1e8"/><path d="M15 30 a9 9 0 0 1 18 0 Z" fill="#3b82d6"/><path d="M8 30 a4 4 0 0 1 8 0 Z" fill="#3b82d6"/><path d="M32 30 a4 4 0 0 1 8 0 Z" fill="#3b82d6"/><path d="M24 21 V16" stroke="#d9a84e" stroke-width="1.6" stroke-linecap="round"/><path d="M21.5 40 v-5 a2.5 2.5 0 0 1 5 0 v5 Z" fill="#123b45"/><rect x="11" y="33" width="3" height="4" rx="1.5" fill="#3b82d6"/><rect x="34" y="33" width="3" height="4" rx="1.5" fill="#3b82d6"/></svg><div><b>כשר מירון</b><small>KASHER MERON</small></div></div>
+<h1>אירוח כשר במירון, לשבת ולכל ימות השנה</h1><p>בדוק זמינות, בחר דירה והשאר פרטים. נציג יחזור אליך לאישור.</p></div><svg class="scene" viewBox="0 0 600 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path d="M0 200 L110 120 L200 175 L330 70 L450 160 L520 120 L600 190 V260 H0 Z" fill="#14424e"/><path d="M0 225 L140 165 L260 205 L380 140 L500 200 L600 170 V260 H0 Z" fill="#0f3540"/><g><rect x="200" y="170" width="200" height="60" fill="#f4f1e8"/><rect x="170" y="190" width="40" height="40" fill="#e6e2d6"/><rect x="390" y="190" width="40" height="40" fill="#e6e2d6"/><path d="M235 170 a65 65 0 0 1 130 0 Z" fill="#3b82d6"/><path d="M170 190 a20 20 0 0 1 40 0 Z" fill="#3b82d6"/><path d="M390 190 a20 20 0 0 1 40 0 Z" fill="#3b82d6"/><path d="M300 105 V84" stroke="#d9a84e" stroke-width="4" stroke-linecap="round"/><circle cx="300" cy="80" r="4" fill="#d9a84e"/><path d="M282 230 v-26 a18 18 0 0 1 36 0 v26 Z" fill="#123b45"/><rect x="215" y="195" width="16" height="22" rx="8" fill="#3b82d6"/><rect x="369" y="195" width="16" height="22" rx="8" fill="#3b82d6"/></g><rect y="230" width="600" height="30" fill="#0a2229"/><g fill="#fff" opacity=".7"><circle cx="60" cy="40" r="1.6"/><circle cx="140" cy="70" r="1.2"/><circle cx="470" cy="30" r="1.8"/><circle cx="540" cy="80" r="1.3"/><circle cx="380" cy="50" r="1.2"/><circle cx="240" cy="25" r="1.4"/></g></svg></header>
+<main>
+<div class="card"><div class="grid">
+<label>כניסה<input type="date" id="ci"></label><label>יציאה<input type="date" id="co"></label>
+<label>אורחים<input type="number" id="gs" min="1" max="60" value="2" inputmode="numeric"></label>
+<label>&nbsp;<button class="btn" id="go">בדוק זמינות</button></label></div>
+<div class="meta" style="margin-top:8px">ברירת המחדל היא השבת הקרובה (שישי עד ראשון).</div>
+<div id="out" class="res" aria-live="polite"></div></div>
+</main>
+<footer>המחירים להמחשה, והמחיר הסופי מאושר על ידי נציג. כשר מירון</footer>
+<div class="modal" id="md" hidden><form class="card" id="fm"><h2 style="margin:0;font:900 22px var(--fd)">בקשת הזמנה</h2><div class="meta" id="md_s"></div>
+<label>שם מלא<input id="f_n" required minlength="2" maxlength="80" autocomplete="name"></label>
+<label>טלפון<input id="f_p" required type="tel" dir="ltr" style="text-align:right" minlength="7" maxlength="20" autocomplete="tel" inputmode="tel"></label>
+<label>הערות<textarea id="f_t" maxlength="400" rows="2"></textarea></label>
+<input class="hp" id="f_h" tabindex="-1" autocomplete="off" aria-hidden="true">
+<div class="err" id="f_e" hidden></div>
+<div style="display:flex;gap:8px"><button class="btn" id="f_b" style="flex:1">שלח בקשה</button><button type="button" class="btn" id="f_x" style="background:var(--line);color:var(--ink);box-shadow:none">ביטול</button></div></form></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+var C=window.MERON_CONFIG||{},sb=window.supabase.createClient(C.url,C.anonKey),$=function(i){return document.getElementById(i)};
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function par(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+function add(s,n){var d=par(s);d.setDate(d.getDate()+n);return iso(d)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+((5-d.getDay()+7)%7||7));
+$("ci").value=iso(d);$("co").value=add(iso(d),2);$("ci").min=iso(new Date());
+$("ci").onchange=function(){if($("co").value<=$("ci").value)$("co").value=add($("ci").value,1)};
+var cat=null,pick=null;
+function load(){return cat?Promise.resolve(cat):sb.rpc("public_catalog").then(function(r){if(r.error)throw r.error;cat=r.data;return cat})}
+function check(){
+  var ci=$("ci").value,co=$("co").value,g=+$("gs").value||1,out=$("out");
+  if(!ci||!co||co<=ci){out.innerHTML='<div class="err">בחר תאריכי כניסה ויציאה תקינים.</div>';return}
+  out.innerHTML='<div class="meta">בודק…</div>';
+  load().then(function(c){
+    var free=c.units.filter(function(u){
+      if(u.beds&&u.beds<g)return false;
+      return !c.busy.some(function(b){return b.u===u.id&&ci<b.out&&b.in<co});
+    });
+    if(!c.units.length){out.innerHTML='<div class="meta">עדיין לא הוגדרו דירות. פנה אלינו בטלפון.</div>';return}
+    if(!free.length){out.innerHTML='<div class="err">אין דירה פנויה בתאריכים האלה. נסה תאריכים אחרים, או השאר פרטים ונציג יציע חלופה.</div>'+'<button class="btn" id="alt" style="align-self:flex-start">השאר פרטים לחזרה</button>';$("alt").onclick=function(){open({id:"any",name:"כל דירה פנויה"})};return}
+    var n=Math.round((par(co)-par(ci))/864e5),fri=par(ci).getDay()===5&&n===2;
+    out.innerHTML=free.map(function(u,i){
+      return '<div class="u"><div><h3>'+esc(u.name)+'</h3><div class="meta">'+esc(u.area||"מירון")+(u.beds?' · '+u.beds+' מיטות':'')+(u.rooms?' · '+u.rooms+' חדרים':'')+'</div></div><div style="text-align:left">'+(fri&&u.sp?'<div class="price">₪'+u.sp.toLocaleString("he-IL")+'</div><div class="meta">לשבת, להמחשה</div>':'<div class="meta">המחיר בהתאם לבקשה</div>')+'<button class="btn" data-i="'+i+'" style="margin-top:6px">בקש הזמנה</button></div></div>';
+    }).join("");
+    out.onclick=function(e){var b=e.target.closest("[data-i]");if(b)open(free[+b.dataset.i])};
+  }).catch(function(){out.innerHTML='<div class="err">לא הצלחנו לבדוק זמינות כרגע. נסה שוב בעוד רגע.</div>'});
+}
+function open(u){pick=u;$("md_s").textContent=u.name+" · "+$("ci").value.split("-").reverse().join("/")+" עד "+$("co").value.split("-").reverse().join("/");$("f_e").hidden=true;$("md").hidden=false;$("f_n").focus()}
+$("f_x").onclick=function(){$("md").hidden=true};
+$("fm").onsubmit=function(e){
+  e.preventDefault();if($("f_h").value)return;
+  var b=$("f_b");b.disabled=true;
+  sb.from("requests").insert({name:$("f_n").value.trim(),phone:$("f_p").value.trim(),unit_id:pick.id,unit_label:pick.name,check_in:$("ci").value,check_out:$("co").value,guests:+$("gs").value||1,notes:$("f_t").value.trim()||null}).then(function(r){
+    b.disabled=false;
+    if(r.error){$("f_e").textContent="השליחה נכשלה. בדוק את הפרטים ונסה שוב.";$("f_e").hidden=false;return}
+    $("md").hidden=true;$("fm").reset();$("out").innerHTML='<div class="note">הבקשה התקבלה. נציג יחזור אליך בהקדם לאישור וסגירת פרטים. תודה!</div>';
+  });
+};
+$("go").onclick=check;check();
+})();
+</script>
+</body>
+</html>
