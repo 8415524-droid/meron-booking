@@ -29,6 +29,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:
 .app{display:flex;min-height:100vh}
 .side{width:244px;flex:none;background:linear-gradient(180deg,#0d2b33 0%,#0a2027 100%);color:var(--side-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:30}
 .logo-tile{height:44px;width:auto;max-width:96px;border-radius:12px;background:#fff;object-fit:contain;padding:3px;flex:none}.logo-full{width:min(340px,84%);height:auto;background:#fff;border-radius:18px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+.brand-logo{padding:16px 16px 12px;display:block}.brand-logo .logo-full{width:100%;box-shadow:none;padding:6px 8px}
 .brand{display:flex;align-items:center;gap:11px;padding:22px 20px 18px}
 .brand svg{flex:none}
 .brand b{display:block;font-family:var(--font-display);font-size:21px;font-weight:900;color:#fff;line-height:1.1}
@@ -142,8 +143,7 @@ body.ro .topbar::after{content:'צפייה בלבד';font-size:12px;font-weight:
 <body>
 <div class="app" id="appwrap" hidden>
   <aside class="side" id="side">
-    <div class="brand"><img class="logo-tile" src="logo-mark.png" alt="">
-<div><b>כשר מירון</b><small>KASHER MERON</small><span class="desc">אירוח ונכסים · מירון</span></div></div>
+    <div class="brand brand-logo"><img class="logo-full" src="logo-full.png" alt="כשר מירון"><span class="desc" hidden></span></div>
     <nav role="tablist" id="tabs" aria-label="תפריט ראשי"></nav>
     <div class="sidefoot"><span class="sub" id="status">טוען נתונים…</span><div id="sidebtns"></div></div>
   </aside>
