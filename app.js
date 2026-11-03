@@ -1,5 +1,5 @@
 (function(){
-var TABS=[["dash","דשבורד"],["intake","הזמנה חדשה"],["bookings","הזמנות"],["cal","יומן שבתות"],["month","תפוסה חודשית"],["props","בתים ויחידות"],["price","מחירון"],["ads","פרסום"],["ops","תחזוקה וניקיון"],["bills","חשבונות נכס"],["inv","חשבוניות"],["exp","הוצאות"],["pay","משכורות"],["ledger","הנהלת חשבונות"],["pl","רווח והפסד"],["fin","התחשבנות"],["requests","בקשות מהאתר"],["search","חיפוש לקוח"],["report","דוח לבעל בית"],["alerts","התראות"],["forecast","תחזית שבתות"],["backup","גיבוי"],["owners","בעלי נכסים"],["users","משתמשים והרשאות"],["pbx","מרכזיה"]];
+var TABS=[["dash","דשבורד"],["intake","הזמנה חדשה"],["bookings","הזמנות"],["cal","יומן שבתות"],["month","תפוסה חודשית"],["props","בתים ויחידות"],["price","מחירון"],["ads","פרסום"],["ops","תחזוקה וניקיון"],["bills","חשבונות נכס"],["inv","חשבוניות"],["exp","הוצאות"],["pay","משכורות"],["ledger","הנהלת חשבונות"],["pl","רווח והפסד"],["fin","התחשבנות"],["requests","בקשות מהאתר"],["search","חיפוש לקוח"],["report","דוח לבעל בית"],["alerts","התראות"],["forecast","תחזית שבתות"],["backup","גיבוי"],["owners","בעלי נכסים"],["users","משתמשים והרשאות"],["pbx","מרכזיה"],["ical","סנכרון יומנים"]];
 var CATS=["שיווק ופרסום","תוכנה ומערכות","טלפוניה","משרד ושכירות","נסיעות","ייעוץ מקצועי","עמלות סליקה","ביטוח","שונות"];
 var STATUS={pending:["ממתין לאישור","warn"],confirmed:["מאושר","ok"],in:["נכנסו","ok"],done:["הסתיים",""],cancelled:["בוטל","bad"]};
 var NEXT={pending:"confirmed",confirmed:"in","in":"done"};
@@ -46,8 +46,8 @@ function newId(col){return S.db.collection(col).doc().id}
 var ROLE=window.MERON_ROLE||"admin";
 var ROLE_TABS={agent:["requests","intake","bookings","search","cal","month","props","alerts"],owner:["bookings","cal","report"],vendor:["ops"],partner:["dash","bookings","forecast","pl","fin","ledger"]};
 var ROLE_HOME={viewer:"dash",admin:"dash",agent:"intake",owner:"bookings",vendor:"ops",partner:"dash"};
-function tabAllowed(k){if(k==="users"||k==="pbx")return ROLE==="admin";return ROLE==="admin"||ROLE==="viewer"||(ROLE_TABS[ROLE]||[]).indexOf(k)>=0}
-var GROUPS=[["הזמנות","book",["dash","requests","intake","bookings","search","cal","month","forecast"]],["נכסים ושיווק","home",["owners","props","price","ads"]],["תפעול","tool",["ops","bills","alerts"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin","report"]],["מערכת","tool",["users","pbx","backup"]]];
+function tabAllowed(k){if(k==="users"||k==="pbx"||k==="ical")return ROLE==="admin";return ROLE==="admin"||ROLE==="viewer"||(ROLE_TABS[ROLE]||[]).indexOf(k)>=0}
+var GROUPS=[["הזמנות","book",["dash","requests","intake","bookings","search","cal","month","forecast"]],["נכסים ושיווק","home",["owners","props","price","ads","ical"]],["תפעול","tool",["ops","bills","alerts"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin","report"]],["מערכת","tool",["users","pbx","backup"]]];
 var GICON={'book': '<path d="M4 5h16v14H4zM4 10h16M9 5v14"/>', 'home': '<path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6"/>', 'tool': '<path d="M14 6a4 4 0 005 5l-9 9-3-3 9-9a4 4 0 00-2-2z"/>', 'coin': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10c0-2 6-2 6 0s-6 2-6 4 6 2 6 0"/>'};
 var GOPEN={};
 function saveG(){}
@@ -519,6 +519,7 @@ function unitLabel(b){var u=unitById(b.unitId||b.propId);if(u)return u.name;var 
 function bUnit(b){return b.unitId||b.propId}
 function isFree(p,ci,co,ignoreId){
   if(p.active===false)return false;
+  if(window.MERON_EXT&&window.MERON_EXT(p.id,ci,co))return false;
   return !S.bookings.some(function(b){return bUnit(b)===p.id&&b.status!=="cancelled"&&b.id!==ignoreId&&overlap(ci,co,b.in,b.out)});
 }
 function houseOpts(sel,all){return (all?'<option value="">כל הבתים</option>':'')+S.props.map(function(h){return '<option value="'+h.id+'"'+(h.id===sel?' selected':'')+'>'+esc(h.name)+'</option>'}).join("")}
