@@ -329,6 +329,36 @@ window.MERON_PBX_CB=function(bookingId){
   });
 };
 
+
+/* ---- קבלות ---- */
+var RC={};
+function rcModal(html){var m=document.getElementById("rc_modal");if(!m){m=document.createElement("div");m.id="rc_modal";m.style.cssText="position:fixed;inset:0;z-index:70;background:rgba(5,15,18,.55);display:flex;align-items:center;justify-content:center;padding:16px";m.addEventListener("click",function(ev){if(ev.target===m)m.remove()});document.body.appendChild(m)}
+  m.innerHTML='<div class="panel stack" style="max-width:480px;width:100%;max-height:90vh;overflow:auto">'+html+'<div class="row"><button class="btn" data-act="rcClose">סגור</button></div></div>'}
+function rcUrl(r){return location.origin+"/receipt.html?t="+r.token}
+function rcRow(r){var u=rcUrl(r);var A_=A();
+  return '<div class="opt"><div class="info"><b>קבלה '+esc(r.no)+'</b><div class="meta">'+esc(r.date)+' · '+A_.money(r.amount)+(r.method?' · '+esc(r.method):'')+'</div></div><div class="row">'
+   +'<a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener">פתח</a>'
+   +'<a class="btn sm" target="_blank" rel="noopener" href="'+esc(wa(r.phone,"שלום "+(r.customer||"")+", מצורפת קבלה מספר "+r.no+" על סך "+A_.money(r.amount)+": "+u)||"#")+'">שלח בוואטסאפ</a>'
+   +'<button class="btn sm" data-act="rcCopy" data-id="'+esc(u)+'">העתק קישור</button></div></div>'}
+function rcShow(bookingId,msg){
+  var a=A();
+  sb().from("docs").select("data").eq("col","receipts").filter("data->>booking","eq",bookingId).then(function(r){
+    var rows=(r.data||[]).map(function(x){return x.data}).sort(function(p,q){return q.no-p.no});
+    var b=a.S.bookings.filter(function(x){return x.id===bookingId})[0];
+    rcModal('<h3>קבלות להזמנה'+(b?' של '+esc(b.name):'')+'</h3>'+(msg?'<div class="note">'+esc(msg)+'</div>':'')
+     +(rows.length?rows.map(rcRow).join(""):'<div class="meta">עדיין לא הונפקו קבלות להזמנה הזו.</div>')
+     +(a.role==="viewer"?'':'<h3 style="margin-top:8px">הפקת קבלה חדשה</h3><div class="grid2"><label>סכום שהתקבל (₪)<input id="rc_amt" type="number" min="1" inputmode="numeric"></label><label>אמצעי תשלום<select id="rc_m"><option>מזומן</option><option>אשראי</option><option>העברה בנקאית</option><option>צ׳ק</option><option>ביט או פייבוקס</option></select></label></div><div class="row"><button class="btn primary" data-act="rcNew" data-id="'+esc(bookingId)+'">הפק קבלה</button></div>'));
+  });
+}
+window.MERON_RCPT={
+  show:rcShow,
+  issue:function(bookingId,amount,method,quiet){
+    return sb().rpc("issue_receipt",{p_booking:bookingId,p_amount:amount,p_method:method||""}).then(function(r){
+      if(r.error){A().toast("הפקת הקבלה נכשלה: "+r.error.message);return null}
+      rcShow(bookingId,"קבלה מספר "+r.data.no+" הופקה. אפשר לשלוח אותה ללקוח בוואטסאפ או להעתיק את הקישור.");return r.data});
+  }
+};
+
 /* ---- גיבוי ---- */
 function dl(name,text){var d=window.claude&&window.claude.use?window.claude.use("downloads"):null;if(!d)return;d.then(function(x){x.save({filename:name,data:new Blob([text],{type:"application/json"})})})}
 async function fetchAll(){
@@ -364,6 +394,10 @@ X.act=function(act,id,el){
   if(act==="pbCopy"){var u=document.getElementById("pb_url");u.select();try{document.execCommand("copy");a.toast("הכתובת הועתקה")}catch(x){}return true}
   if(act==="pbRot"){if(!confirm("להחליף את הסוד? צריך לעדכן את הכתובת החדשה בטכנוליין."))return true;sb().rpc("pbx_rotate_secret").then(function(r){a.toast(r.error?"נכשל":"הסוד הוחלף, עדכן בטכנוליין");pbLoad()});return true}
   if(act==="pbSave"){var m=document.getElementById("pb_msg");sb().rpc("pbx_set_config",{p_service:document.getElementById("pb_svc").value,p_key:document.getElementById("pb_key").value,p_callback:document.getElementById("pb_cb").checked}).then(function(r){m.textContent=r.error?"השמירה נכשלה: "+r.error.message:"נשמר";if(!r.error)pbLoad()});return true}
+  if(act==="rcClose"){var mm=document.getElementById("rc_modal");if(mm)mm.remove();return true}
+  if(act==="rcCopy"){try{navigator.clipboard.writeText(id);a.toast("הקישור הועתק")}catch(x){a.toast(id)}return true}
+  if(act==="rcShow"){rcShow(id);return true}
+  if(act==="rcNew"){var amt=+document.getElementById("rc_amt").value;if(!(amt>0)){a.toast("הזן סכום");return true}window.MERON_RCPT.issue(id,amt,document.getElementById("rc_m").value);return true}
   if(act==="usEdit"){US.edit=US.rows.filter(function(u){return u.email===id})[0]||null;X.tabs.users.form();window.scrollTo({top:0,behavior:"smooth"});return true}
   if(act==="usCancel"){US.edit=null;X.tabs.users.form();return true}
   if(act==="usDel"){if(!confirm("להסיר את "+id+" מהמורשים? הוא לא יוכל להיכנס."))return true;sb().rpc("staff_delete",{p_email:id}).then(function(r){a.toast(r.error?"המחיקה נכשלה":"הוסר");usLoad()});return true}

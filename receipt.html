@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>קבלה</title><meta name="robots" content="noindex">
+<style>
+body{margin:0;background:#eef2f3;font:16px/1.5 Arial,Heebo,sans-serif;color:#14233a}
+.sheet{max-width:640px;margin:20px auto;background:#fff;border-radius:14px;padding:28px 30px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid #c29a52;padding-bottom:14px}
+.top img{height:70px}.co b{display:block;font-size:20px}.co span{display:block;font-size:13.5px;color:#556}
+h1{margin:18px 0 2px;font-size:26px}.no{color:#556;font-size:14px}
+dl{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;margin:18px 0}dt{color:#667}dd{margin:0;font-weight:600}
+.amt{margin:16px 0;padding:14px 18px;background:#f6f1e3;border-radius:10px;font-size:22px;font-weight:800;display:flex;justify-content:space-between}
+.foot{font-size:12.5px;color:#667;margin-top:18px;border-top:1px solid #e3e3e3;padding-top:10px}
+.btns{text-align:center;margin:14px}button{font:600 15px Arial;padding:10px 22px;border-radius:99px;border:0;background:#0e8a7c;color:#fff;cursor:pointer}
+#err{text-align:center;padding:60px 20px;color:#9b2020}
+@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;max-width:none}.btns{display:none}}
+</style></head><body>
+<div id="app"><div id="err" style="color:#667">טוען…</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function d(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"/"+m[2]+"/"+m[1]:""}
+  function money(n){return "₪"+Number(n||0).toLocaleString("he-IL")}
+  var t=new URLSearchParams(location.search).get("t")||"";
+  var app=document.getElementById("app");
+  if(!t){app.innerHTML='<div id="err">קישור לא תקין</div>';return}
+  var sb=window.supabase.createClient(MERON_CONFIG.url,MERON_CONFIG.anonKey);
+  sb.rpc("receipt_public",{p_token:t}).then(function(r){
+    var x=r.data;if(r.error||!x){app.innerHTML='<div id="err">הקבלה לא נמצאה</div>';return}
+    document.title="קבלה מספר "+x.no;
+    app.innerHTML='<div class="sheet"><div class="top"><div class="co"><b>'+esc(x.company)+'</b>'
+     +(x.companyId?'<span>ח.פ '+esc(x.companyId)+'</span>':'')+(x.companyAddr?'<span>'+esc(x.companyAddr)+'</span>':'')+(x.companyPhone?'<span>טלפון '+esc(x.companyPhone)+'</span>':'')+'</div><img src="logo-full.png" alt=""></div>'
+     +'<h1>קבלה מספר '+esc(x.no)+'</h1><div class="no">תאריך '+d(x.date)+' · '+esc(x.time)+'</div>'
+     +'<dl><dt>התקבל מאת</dt><dd>'+esc(x.customer)+'</dd>'
+     +'<dt>עבור</dt><dd>אירוח: '+esc(x.house)+(x.unit?' · '+esc(x.unit):'')+'</dd>'
+     +'<dt>תאריכי שהייה</dt><dd>'+d(x.in)+' עד '+d(x.out)+'</dd>'
+     +(x.method?'<dt>אמצעי תשלום</dt><dd>'+esc(x.method)+'</dd>':'')+'</dl>'
+     +'<div class="amt"><span>סכום שהתקבל</span><span>'+money(x.amount)+'</span></div>'
+     +'<div class="foot">מסמך זה הופק אוטומטית ונשמר במערכת. תודה שבחרתם בכשר מירון.</div></div>'
+     +'<div class="btns"><button onclick="window.print()">הדפס או שמור כ-PDF</button></div>';
+  });
+})();
+</script></body></html>

@@ -162,7 +162,7 @@ function updBookings(){
      +'<div class="row">'
      +'<button class="btn sm" data-act="copyMsg" data-id="'+b.id+'">העתק הודעת אישור</button>'
      +(nxt?'<button class="btn primary sm" data-act="advance" data-id="'+b.id+'">'+NEXT_LABEL[b.status]+'</button>':'')
-     +(b.status!=="cancelled"&&b.status!=="done"?'<button class="btn sm" data-act="addDep" data-id="'+b.id+'">רשום תשלום</button>':'')
+     +(b.status!=="cancelled"&&b.status!=="done"?'<button class="btn sm" data-act="addDep" data-id="'+b.id+'">רשום תשלום</button>':'')+'<button class="btn sm" data-act="rcShow" data-id="'+b.id+'">קבלות</button>'
      +(b.status==="done"&&!b.ownerPaid?'<button class="btn sm" data-act="ownerPaid" data-id="'+b.id+'">סמן ששולם לבעל הדירה</button>':'')
      +(b.status!=="cancelled"&&b.status!=="done"?'<button class="btn danger sm" data-act="cancelB" data-id="'+b.id+'">בטל</button>':'')
      +(S.confirmDel===b.id?'<button class="btn danger sm" data-act="delB" data-id="'+b.id+'">מחק סופית</button><button class="btn sm" data-act="noDel">השאר</button>':'<button class="btn sm" data-act="askDel" data-id="'+b.id+'">מחק</button>')
@@ -241,7 +241,7 @@ function act(a,id,el){
     var total=+val("b_total")||0;
     save("bookings",bid,{propId:p.houseId,unitId:p.id,source:val("b_src"),name:name,phone:phone,guests:+val("i_g")||1,in:ci,out:co,total:total,dep:+val("b_dep")||0,
       pct:p.pct,status:"pending",notes:val("b_notes").trim(),ownerPaid:false,createdAt:Date.now()},"ההזמנה נשמרה").then(function(){
-      if((+val("b_dep")||0)>0&&window.MERON_PBX_CB)window.MERON_PBX_CB(bid);
+      if((+val("b_dep")||0)>0){if(window.MERON_RCPT)window.MERON_RCPT.issue(bid,+val("b_dep"),"");if(window.MERON_PBX_CB)window.MERON_PBX_CB(bid)}
       S.selId=null;S.draft=null;mountIntake($("view"));
     });
     return;
@@ -261,7 +261,7 @@ function act(a,id,el){
   if(a==="depOk"&&b){
     var amt=+el.parentNode.querySelector("input").value;
     if(!(amt>0)){toast("הזן סכום");return}
-    var firstDep=!(b.dep>0);return save("bookings",b.id,Object.assign({},b.raw,{dep:(b.dep||0)+amt}),"התשלום נרשם").then(function(){if(firstDep&&window.MERON_PBX_CB)window.MERON_PBX_CB(b.id)});
+    var firstDep=!(b.dep>0);return save("bookings",b.id,Object.assign({},b.raw,{dep:(b.dep||0)+amt}),"התשלום נרשם").then(function(){if(window.MERON_RCPT)window.MERON_RCPT.issue(b.id,amt,"");if(firstDep&&window.MERON_PBX_CB)window.MERON_PBX_CB(b.id)});
   }
   if(a==="askDel"){S.confirmDel=id;refresh();return}
   if(a==="noDel"){S.confirmDel=null;refresh();return}
@@ -334,7 +334,7 @@ function mountInv(v){
    +'<div class="row"><button class="btn primary" data-act="genInv">הפק טיוטת חשבונית</button></div></div>'
    +'<div class="list" id="v_list"></div>'
    +'<div class="panel stack"><h2>הגדרות חשבונאות</h2><div class="grid2">'
-   +'<label>שם החברה<input id="g_co" value="'+esc(S.cfg.company)+'"></label>'
+   +'<label>שם החברה<input id="g_co" value="'+esc(S.cfg.company)+'"></label><label>ח.פ<input id="g_cid" value="'+esc(S.cfg.companyId||"")+'"></label><label>כתובת החברה<input id="g_ca" value="'+esc(S.cfg.companyAddr||"")+'"></label><label>טלפון החברה<input id="g_cp" value="'+esc(S.cfg.companyPhone||"")+'"></label>'
    +'<label>מע״מ באחוזים<input id="g_vat" type="number" step="0.5" value="'+S.cfg.vat+'"></label>'
    +'<label>עלויות מעביד מעל השכר הברוטו, באחוזים (הערכה)<input id="g_on" type="number" step="0.5" value="'+S.cfg.oncost+'"></label></div>'
    +'<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="g_inc" style="width:auto"'+(S.cfg.commIncVat?' checked':'')+'> אחוז העמלה כבר כולל מע״מ</label>'
@@ -451,7 +451,7 @@ function actX(a,id,el){
   }
   if(a==="delSeason"){S.confirmDel=null;del("seasons",id);return true}
   if(a==="saveCfg"){
-    var c={company:val("g_co").trim(),vat:+val("g_vat")||0,oncost:+val("g_on")||0,commIncVat:$("g_inc").checked,nextInv:S.cfg.nextInv||1};
+    var c={company:val("g_co").trim(),companyId:val("g_cid").trim(),companyAddr:val("g_ca").trim(),companyPhone:val("g_cp").trim(),vat:+val("g_vat")||0,oncost:+val("g_on")||0,commIncVat:$("g_inc").checked,nextInv:S.cfg.nextInv||1};
     save("settings","main",c,"ההגדרות נשמרו");return true;
   }
   if(a==="genInv"){
