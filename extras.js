@@ -296,6 +296,39 @@ X.tabs.users={
   }
 };
 
+
+/* ---- מרכזיה (טכנוליין) ---- */
+var PB={cfg:null,err:null,loaded:false};
+function pbLoad(){sb().rpc("pbx_get_config").then(function(r){PB.loaded=true;if(r.error){PB.err=r.error.message;PB.cfg=null}else{PB.err=null;PB.cfg=r.data}if(A().S.tab==="pbx")X.tabs.pbx.upd()})}
+X.tabs.pbx={
+  mount:function(v){v.innerHTML='<div class="stack"><div class="panel stack" id="pb_box"></div></div>';pbLoad();X.tabs.pbx.upd()},
+  upd:function(){
+    var el=document.getElementById("pb_box");if(!el)return;
+    if(!PB.loaded){el.innerHTML='<div class="empty">טוען…</div>';return}
+    if(PB.err||!PB.cfg){el.innerHTML='<div class="note">לא ניתן לטעון. ייתכן שהסקריפט supabase/pbx.sql עדיין לא הורץ ב-Supabase. '+esc(PB.err||"")+'</div>';return}
+    var c=PB.cfg,url=location.origin+"/api/pbx/"+c.secret;
+    el.innerHTML='<h2>מרכזיה (טכנוליין)</h2>'
+     +'<div class="meta">שתי שלוחות: <b>1</b> מעבירה להזמנות ולשירות לקוחות, <b>2</b> מזהה לקוח קיים לפי מספר הטלפון שממנו התקשר, ומחברת אותו ישירות למארח של ההזמנה שלו. אם יש כמה הזמנות פעילות, הלקוח בוחר. בלי הזמנה פעילה, מחברים לפי ההזמנה האחרונה.</div>'
+     +'<label>כתובת להזנה בטכנוליין (שלוחה מסוג API)<input id="pb_url" readonly dir="ltr" style="text-align:left" value="'+esc(url)+'"></label>'
+     +'<div class="row"><button class="btn sm" data-act="pbCopy">העתק כתובת</button><button class="btn sm danger" data-act="pbRot">החלף סוד (מבטל את הכתובת הקודמת)</button></div>'
+     +'<div class="grid2"><label>טלפון הזמנות ושירות לקוחות<input id="pb_svc" type="tel" dir="ltr" style="text-align:right" value="'+esc(c.service_phone)+'"></label>'
+     +'<label>מפתח API של טכנוליין (אופציונלי)<input id="pb_key" type="password" dir="ltr" style="text-align:right" placeholder="'+(c.has_key?"נשמר, השאר ריק כדי לא לשנות":"לא הוגדר")+'"></label></div>'
+     +'<label style="flex-direction:row;align-items:center;gap:8px"><input id="pb_cb" type="checkbox" style="width:auto"'+(c.callback_on?' checked':'')+'> צינתוק ללקוח אחרי הזמנה ואישור מקדמה (לפי טלפון המארח בנכס)</label>'
+     +'<div class="note">הצינתוק יפעל רק אחרי שטכנוליין יאשרו כתובת IP קבועה ליציאה אליהם. עד אז הניסיון ייכשל והסיבה תירשם בהזמנה.</div>'
+     +'<div class="row"><button class="btn primary" data-act="pbSave">שמור</button></div><div class="meta" id="pb_msg"></div>'}
+};
+
+
+/* צינתוק ללקוח אחרי מקדמה: נקרא מ-app.js */
+window.MERON_PBX_CB=function(bookingId){
+  if(!sb()||!sb().auth)return;
+  sb().auth.getSession().then(function(s){
+    var t=s&&s.data&&s.data.session&&s.data.session.access_token;if(!t)return;
+    fetch("/api/pbx-callback",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({booking:bookingId})})
+     .then(function(r){return r.json()}).then(function(j){if(j&&j.skipped)return;A().toast(j&&j.ok?j.note:(j&&(j.error||j.note))||"הצינתוק נכשל")}).catch(function(){});
+  });
+};
+
 /* ---- גיבוי ---- */
 function dl(name,text){var d=window.claude&&window.claude.use?window.claude.use("downloads"):null;if(!d)return;d.then(function(x){x.save({filename:name,data:new Blob([text],{type:"application/json"})})})}
 async function fetchAll(){
@@ -328,6 +361,9 @@ X.act=function(act,id,el){
     var nn=prompt("שם בעל הנכס:",o2.name);if(nn==null)return true;nn=nn.trim()||o2.name;
     var np=prompt("טלפון:",o2.phone||"");if(np==null)return true;
     Promise.all(o2.houses.map(function(h){return a.save("properties",h.id,(function(d){delete d.id;d.owner=nn;d.ownerPhone=np.trim();return d})(Object.assign({},h)))})).then(function(){a.toast("הפרטים עודכנו")});return true}
+  if(act==="pbCopy"){var u=document.getElementById("pb_url");u.select();try{document.execCommand("copy");a.toast("הכתובת הועתקה")}catch(x){}return true}
+  if(act==="pbRot"){if(!confirm("להחליף את הסוד? צריך לעדכן את הכתובת החדשה בטכנוליין."))return true;sb().rpc("pbx_rotate_secret").then(function(r){a.toast(r.error?"נכשל":"הסוד הוחלף, עדכן בטכנוליין");pbLoad()});return true}
+  if(act==="pbSave"){var m=document.getElementById("pb_msg");sb().rpc("pbx_set_config",{p_service:document.getElementById("pb_svc").value,p_key:document.getElementById("pb_key").value,p_callback:document.getElementById("pb_cb").checked}).then(function(r){m.textContent=r.error?"השמירה נכשלה: "+r.error.message:"נשמר";if(!r.error)pbLoad()});return true}
   if(act==="usEdit"){US.edit=US.rows.filter(function(u){return u.email===id})[0]||null;X.tabs.users.form();window.scrollTo({top:0,behavior:"smooth"});return true}
   if(act==="usCancel"){US.edit=null;X.tabs.users.form();return true}
   if(act==="usDel"){if(!confirm("להסיר את "+id+" מהמורשים? הוא לא יוכל להיכנס."))return true;sb().rpc("staff_delete",{p_email:id}).then(function(r){a.toast(r.error?"המחיקה נכשלה":"הוסר");usLoad()});return true}
