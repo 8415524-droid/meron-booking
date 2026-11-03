@@ -21,6 +21,20 @@ function parse(text) {
   }
   return out;
 }
+function parseCsv(text) {
+  const out = [];
+  for (const l of String(text).split(/\r?\n/)) {
+    const ds = [];
+    const re = /(\d{4})-(\d{1,2})-(\d{1,2})|(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/g; let m;
+    while ((m = re.exec(l))) {
+      const y = m[1] || m[6], mo = m[2] || m[5], d = m[3] || m[4];
+      ds.push(y + "-" + String(mo).padStart(2, "0") + "-" + String(d).padStart(2, "0"));
+    }
+    if (ds.length >= 2) out.push({ in: ds[0], out: ds[1] > ds[0] ? ds[1] : addDay(ds[0], 1) });
+    else if (ds.length === 1) out.push({ in: ds[0], out: addDay(ds[0], 1) });
+  }
+  return out;
+}
 function blocked(host) {
   return /^(localhost|.*\.local|.*\.internal)$/i.test(host) || /^\d+\.\d+\.\d+\.\d+$/.test(host) || host.includes(":") || !host.includes(".");
 }
@@ -40,6 +54,7 @@ module.exports = async (req, res) => {
     const r = await fetch(url.toString(), { signal: ac.signal, redirect: "follow", headers: { "User-Agent": "meron-booking-ical" } });
     clearTimeout(t);
     const txt = (await r.text()).slice(0, 3000000);
+    if (r.ok && !/BEGIN:VCALENDAR/.test(txt) && !/<html/i.test(txt)) { const rg = parseCsv(txt); if (rg.length) return out(200, { ok: true, ranges: rg, kind: "csv" }); }
     if (!r.ok || !/BEGIN:VCALENDAR/.test(txt)) return out(200, { ok: false, error: "הכתובת לא החזירה יומן iCal (קוד " + r.status + ")" });
     return out(200, { ok: true, ranges: parse(txt) });
   } catch (e) { return out(200, { ok: false, error: "לא ניתן לקרוא את היומן: " + (e.name === "AbortError" ? "תם הזמן" : e.message) }); }
