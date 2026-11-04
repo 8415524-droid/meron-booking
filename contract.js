@@ -95,7 +95,7 @@ function agrDraw(){
       +'<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" style="width:auto" id="ag_px_'+esc(key(n))+'"'+(g.pbx?' checked':'')+'> אישר חיבור הטלפון למרכזייה</label>'
       +'<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" style="width:auto" id="ag_sg_'+esc(key(n))+'"'+(g.signed?' checked':'')+'> החוזה נחתם</label>'
       +'<label>הערות<input id="ag_nz_'+esc(key(n))+'" value="'+esc(g.notes||"")+'"></label>'
-      +'<div class="row"><button class="btn primary sm" data-act="agSave" data-id="'+esc(n)+'">שמור</button><button class="btn sm" data-act="agApply" data-id="'+esc(n)+'">החל את אחוז העמלה על כל הבתים שלו</button></div></div>';
+      +'<div class="row"><button class="btn primary sm" data-act="agSave" data-id="'+esc(n)+'">שמור</button><a class="btn sm" target="_blank" rel="noopener" href="contract.html?o='+encodeURIComponent(n)+'">הפק הסכם להדפסה</a><button class="btn sm" data-act="agApply" data-id="'+esc(n)+'">החל את אחוז העמלה על כל הבתים שלו</button></div></div>';
    }).join(""):'<div class="empty">עדיין אין בעלי נכסים בבתים.</div>');
 }
 X.tabs.agr={mount:function(v){v.innerHTML='<div class="stack"><div class="panel stack" id="ag_box"></div></div>';agrDraw();agrLoad()},upd:function(){agrDraw()}};

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>הסכם</title><meta name="robots" content="noindex">
+<style>
+body{margin:0;background:#eef2f3;font:15.5px/1.7 Arial,Heebo,sans-serif;color:#14233a}
+.sheet{max-width:780px;margin:16px auto;background:#fff;border-radius:12px;padding:30px 36px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+h1{font-size:24px;text-align:center;margin:0 0 14px}h2{font-size:17px;margin:18px 0 4px}p{margin:3px 0}
+.sub{padding-right:20px}.draft{background:#fff3d6;border:1px solid #e0b64a;border-radius:8px;padding:8px 12px;margin-bottom:14px;font-size:14px}
+.btns{max-width:780px;margin:0 auto 20px;text-align:center}button{font:inherit;padding:10px 22px;border-radius:10px;border:0;background:#0d3b66;color:#fff;cursor:pointer}
+.pb{page-break-before:always}#err{text-align:center;padding:60px 20px;color:#a33}
+@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;max-width:none;padding:0}.btns,.draft{display:none}}
+</style></head><body>
+<div id="app"><div id="err">טוען…</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script><script src="contract-text.js"></script>
+<script>
+(function(){
+  var FINAL=false; /* לשנות ל-true רק אחרי שעורך הדין אישר את הנוסח */
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function d(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"/"+m[2]+"/"+m[1]:""}
+  var q=new URLSearchParams(location.search),owner=q.get("o")||"",app=document.getElementById("app");
+  var sb=window.supabase.createClient(MERON_CONFIG.url,MERON_CONFIG.anonKey);
+  function key(o){return "a_"+encodeURIComponent(o).replace(/%/g,"")}
+  function fill(l,v){var m=/^([^:_]+:)\s*_+.*$/.exec(l);return m&&v!=null&&v!==""?m[1]+" "+v:l}
+  sb.auth.getSession().then(function(s){
+    if(!s.data.session){app.innerHTML='<div id="err">צריך להיות מחובר למערכת כדי להפיק הסכם.</div>';return}
+    return Promise.all([
+      sb.from("docs").select("id,data").eq("col","agreements").eq("id",key(owner)),
+      sb.from("docs").select("id,data").eq("col","properties"),
+      sb.from("docs").select("id,data").eq("col","units"),
+      sb.from("docs").select("data").eq("col","settings").eq("id","main")
+    ]).then(function(r){
+      var g=(r[0].data&&r[0].data[0]&&r[0].data[0].data)||null;
+      if(!g){app.innerHTML='<div id="err">אין כרטיס הסכם לבעל הנכס הזה. מלא אותו במסך "הסכמי בעלי נכסים".</div>';return}
+      var hs=(r[1].data||[]).filter(function(h){return h.data.owner===owner}).map(function(h){return Object.assign({id:h.id},h.data)});
+      var us=(r[2].data||[]).map(function(u){return Object.assign({id:u.id},u.data)});
+      var st=(r[3].data&&r[3].data[0]&&r[3].data[0].data)||{};
+      var ownerPhone=(hs[0]&&hs[0].ownerPhone)||"";
+      var units=[];hs.forEach(function(h){var mine=us.filter(function(u){return u.houseId===h.id});(mine.length?mine:[h]).forEach(function(u){units.push({h:h,u:u})})});
+      var beds=units.reduce(function(a,x){return a+(+x.u.beds||0)},0);
+      var months=(g.start&&g.end)?Math.round((new Date(g.end)-new Date(g.start))/2629800000):"";
+      var L=window.CONTRACT_LINES.slice(),seenName=0,seenId=0,seenAddr=0,seenPh=0,out=[];
+      var today=new Date(),hd=today.getDate()+" בחודש "+today.toLocaleDateString("he-IL",{month:"long"})+" שנת "+today.getFullYear();
+      for(var i=0;i<L.length;i++){
+        var l=L[i];
+        if(/^שנערך ונחתם/.test(l)){l="שנערך ונחתם ביום "+hd;}
+        else if(/^שם \/ חברה:/.test(l)){seenName++;l=fill(l,seenName===1?owner:(st.company||"אישור ריאליטי"))}
+        else if(/^ח\.פ\. \/ ת\.ז\.:/.test(l)){seenId++;l=fill(l,seenId===1?g.idno:st.companyId)}
+        else if(/^כתובת:/.test(l)){seenAddr++;l=fill(l,seenAddr===1?g.addr:st.companyAddr)}
+        else if(/^טלפון:/.test(l)){seenPh++;l=fill(l,seenPh===1?ownerPhone:st.companyPhone)}
+        else if(/^13\.1\./.test(l)&&g.start&&g.end){l="13.1. הסכם זה ייכנס לתוקף ביום חתימתו ויהיה בתוקף למשך "+months+" חודשים, עד ליום "+d(g.end)+"."}
+        else if(/^13\.3\./.test(l)&&g.notice){l="13.3. כל צד יהיה רשאי להביא את ההסכם לסיומו בהודעה מוקדמת בכתב של "+g.notice+" ימים לצד השני."}
+        else if(/^6\.1\./.test(l)&&g.pct!=null){l="6.1. בגין כל הזמנה של לקוח שהגיע באמצעות פעילות השיווק של מנהל ההזמנות, יהיה מנהל ההזמנות זכאי לעמלה בשיעור של "+g.pct+"% מסכום ההזמנה הכולל"+(g.incVat===false?", לא כולל מע\"מ.":", כולל מע\"מ.")}
+        else if(/^כתובת הנכס:/.test(l)){l=fill(l,hs.map(function(h){return h.name+(h.area?" ("+h.area+")":"")}).join(", "))}
+        else if(/^שם הנכס/.test(l)){l=fill(l,hs.map(function(h){return h.name}).join(", "))}
+        else if(/^מספר יחידות אירוח:/.test(l)){l=fill(l,units.length)}
+        else if(/^מספר מיטות/.test(l)){l=fill(l,beds)}
+        else if(/^מחיר ללילה באמצע שבוע:/.test(l)){l=units.map(function(x){return (x.u.name||x.h.name)+": ₪"+(x.u.price||0)}).join(" · ")}
+        else if(/^מחיר ללילה בסוף שבוע:/.test(l)){l=units.map(function(x){return (x.u.name||x.h.name)+": חבילת שבת ₪"+(x.u.shabbatPrice||0)}).join(" · ")}
+        else if(/^עמלת מנהל ההזמנות: /.test(l)&&g.pct!=null){l="עמלת מנהל ההזמנות: "+g.pct+"%"+(g.incVat===false?" לא כולל מע\"מ":" כולל מע\"מ")+" מסכום ההזמנה הכולל."}
+        else if(/^תקופת ההסכם: _/.test(l)&&months!==""){l="תקופת ההסכם: "+months+" חודשים."}
+        else if(/^הודעה מוקדמת לסיום ההסכם:/.test(l)&&g.notice){l="הודעה מוקדמת לסיום ההסכם: "+g.notice+" ימים."}
+        else if(/^טלפון בעל הנכס להעברה ללקוחות:/.test(l)){l=fill(l,ownerPhone)}
+        else if(/^דוא"ל:/.test(l)){l=fill(l,g.email)}
+        else if(/^האם נדרש חיבור למרכזיית/.test(l)){l="האם נדרש חיבור למרכזיית הטלפונים: "+(g.pbx?"כן":"לא")}
+        out.push(l);
+      }
+      var html="";
+      out.forEach(function(l){
+        if(!l){return}
+        if(/^נספח א'/.test(l)){html+='<h1 class="pb">'+esc(l)+'</h1>';return}
+        if(l==="הסכם למתן שירותי שיווק וניהול הזמנות"){html+='<h1>'+esc(l)+'</h1>';return}
+        if(/^\d+\.\s/.test(l)){html+='<h2>'+esc(l)+'</h2>';return}
+        html+='<p'+(/^\d+\.\d+\./.test(l)?' class="sub"':'')+'>'+esc(l)+'</p>';
+      });
+      app.innerHTML=(FINAL?'':'<div class="sheet" style="padding:0;box-shadow:none;background:none;margin-bottom:0"><div class="draft">טיוטה: הנוסח טרם אושר על ידי עורך דין. ההדפסה לא כוללת הודעה זו.</div></div>')+'<div class="sheet">'+html+'</div><div class="btns"><button onclick="window.print()">הדפס או שמור כ-PDF</button></div>';
+      document.title="הסכם - "+owner;
+    });
+  });
+})();
+</script></body></html>
