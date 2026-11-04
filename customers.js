@@ -82,7 +82,7 @@ function draw(){
      +'<div class="row"><button class="btn primary" data-act="cuSave" data-id="'+esc(e.id)+'">שמור</button><button class="btn" data-act="cuClose">סגור</button></div></div>':'')
    +(rows.length?rows.map(function(c){
      var bs=a.S.bookings.filter(function(b){return dg(b.phone)===dg(c.phone)});
-     return '<div class="opt"><div class="info"><b>'+esc(c.name||"ללא שם")+'</b> <span dir="ltr">'+esc(c.phone)+'</span><div class="meta">'+esc(c.city||"")+(c.idno?' · ת.ז. '+esc(c.idno):'')+' · '+bs.length+' הזמנות'+(c.note?' · '+esc(c.note):'')+'</div></div><div class="row"><a class="btn sm" href="tel:'+esc(c.phone)+'">התקשר</a><button class="btn sm" data-act="cuEdit" data-id="'+esc(c.id)+'">פתח כרטיס</button></div></div>';
+     return '<div class="opt"><div class="info"><b>'+esc(c.name||"ללא שם")+'</b> <span dir="ltr">'+esc(c.phone)+'</span><div class="meta">'+esc(c.city||"")+(c.idno?' · ת.ז. '+esc(c.idno):'')+' · '+bs.length+' הזמנות'+(c.note?' · '+esc(c.note):'')+'</div></div><div class="row"><a class="btn sm" href="tel:'+esc(c.phone)+'">התקשר</a><button class="btn sm" data-act="cuCall" data-id="'+esc(c.id)+'">תעד שיחה</button><button class="btn sm" data-act="cuEdit" data-id="'+esc(c.id)+'">פתח כרטיס</button></div></div>';
    }).join(""):'<div class="empty">אין לקוחות להצגה.</div>');
   var qi=document.getElementById("cu_q");if(qi)qi.addEventListener("input",function(){CU.q=qi.value;var p=qi.selectionStart;draw();var n=document.getElementById("cu_q");if(n){n.focus();n.setSelectionRange(p,p)}});
 }
@@ -90,6 +90,7 @@ X.tabs.cust={mount:function(v){v.innerHTML='<div class="stack"><div class="panel
 var prev=X.act;
 X.act=function(act,id,el){
   if(act==="cuEdit"){CU.edit=id;draw();window.scrollTo({top:0,behavior:"smooth"});return true}
+  if(act==="cuCall"){var cc=CU.rows[id];if(cc&&window.MERON_CALL_NEW)window.MERON_CALL_NEW(cc.phone,cc.name);return true}
   if(act==="cuClose"){CU.edit=null;draw();return true}
   if(act==="cuSave"){var c=CU.rows[id];if(!c)return true;
     window.MERON_CUST.upsert({name:val("cu_n").trim(),phone:c.phone,idno:val("cu_i").replace(/\D/g,""),city:val("cu_c").trim(),phone2:val("cu_p2").trim(),note:val("cu_t").trim()}).then(function(){A().toast("הכרטיס נשמר");CU.edit=null;draw()});return true}
