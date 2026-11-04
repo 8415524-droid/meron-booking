@@ -1,14 +1,16 @@
 /* סנכרון יומנים (iCal): ייצוא היומן שלנו לכל יחידה, וייבוא יומנים חיצוניים של בעלי הנכסים כתאריכים תפוסים. */
 (function(){
-var X=window.MERON_X, EX={own:{},rows:{},secret:null,loaded:false,err:null,busy:{}};
+var X=window.MERON_X, EX={own:{},ownp:{},rows:{},secret:null,loaded:false,err:null,busy:{}};
 function A(){return window.MERON_APP}
 function sb(){return window.MERON_SB}
 function esc(s){return A().esc(s)}
 window.MERON_EXT=function(id,ci,co){var r=EX.rows[id];if(r&&r.ranges&&r.ranges.some(function(x){return ci<x.out&&x.in<co}))return true;var o=EX.own[id];return !!(o&&o.some(function(x){return ci<x.out&&x.in<co}))};
+window.MERON_PRICE=function(id,day){var l=EX.ownp[id];if(!l)return null;var m=null;l.forEach(function(x){if(day>=x.from&&day<=x.to)m=x.price});return m};
 function token(){return sb().auth.getSession().then(function(s){return s&&s.data&&s.data.session&&s.data.session.access_token})}
 function load(){
   if(!sb()||!A())return Promise.resolve();
-  return Promise.all([sb().from("docs").select("id,data").eq("col","extical"),sb().rpc("ical_get_secret"),sb().from("docs").select("data").eq("col","ownblocks")]).then(function(r){
+  return Promise.all([sb().from("docs").select("id,data").eq("col","extical"),sb().rpc("ical_get_secret"),sb().from("docs").select("data").eq("col","ownblocks"),sb().from("docs").select("data").eq("col","ownprices")]).then(function(r){
+    EX.ownp={};(r[3].data||[]).forEach(function(d){var b=d.data;(EX.ownp[b.unitId]=EX.ownp[b.unitId]||[]).push(b)});
     EX.own={};(r[2].data||[]).forEach(function(d){var b=d.data;(EX.own[b.unitId]=EX.own[b.unitId]||[]).push({in:b.from,out:b.to})});
     EX.rows={};(r[0].data||[]).forEach(function(d){EX.rows[d.id]=d.data});
     EX.secret=r[1].error?null:r[1].data;EX.err=r[1].error?r[1].error.message:null;EX.loaded=true;
