@@ -36,7 +36,8 @@ function draw(){
   var q=CL.q.trim().toLowerCase();
   var rows=CL.rows.filter(function(c){
     if(CL.f==="open"&&(c.status==="booked"||c.status==="lost"))return false;
-    if(CL.f!=="open"&&CL.f!=="all"&&c.status!==CL.f)return false;
+    if(CL.f==="answered"&&!c.answered)return false;
+    if(CL.f!=="open"&&CL.f!=="all"&&CL.f!=="answered"&&c.status!==CL.f)return false;
     return !q||(c.name||"").toLowerCase().indexOf(q)>=0||(c.phone||"").indexOf(q)>=0||(c.title||"").toLowerCase().indexOf(q)>=0;
   });
   var due=CL.rows.filter(function(c){return c.follow&&c.follow<=t&&c.status!=="booked"&&c.status!=="lost"});
@@ -45,14 +46,19 @@ function draw(){
    +'<div class="meta">כל שיחה מקבלת כותרת וסטטוס. לקוחות שבכיוון סגירה מסומנים בירוק, ושיחה עם תאריך מעקב שהגיע מופיעה למעלה.</div>'
    +(due.length?'<div class="note"><b>מעקב להיום:</b> '+due.map(function(c){return esc(c.name||c.phone)+' ('+esc(c.title||"")+')'}).join(" · ")+'</div>':'')
    +'<div class="row" style="flex-wrap:wrap"><button class="btn primary" data-act="clNew">תעד שיחה חדשה</button>'
-   +[["open","פתוחות"],["closing","בכיוון סגירה ("+(cnt.closing||0)+")"],["waiting","ממתינות ("+(cnt.waiting||0)+")"],["booked","הוזמנו"],["lost","לא רלוונטי"],["all","הכול"]].map(function(f){return '<button class="btn sm'+(CL.f===f[0]?' primary':'')+'" data-act="clF" data-id="'+f[0]+'">'+f[1]+'</button>'}).join("")+'</div>'
+   +[["open","פתוחות"],["answered","נכנסות שנענו"],["closing","בכיוון סגירה ("+(cnt.closing||0)+")"],["waiting","ממתינות ("+(cnt.waiting||0)+")"],["booked","הוזמנו"],["lost","לא רלוונטי"],["all","הכול"]].map(function(f){return '<button class="btn sm'+(CL.f===f[0]?' primary':'')+'" data-act="clF" data-id="'+f[0]+'">'+f[1]+'</button>'}).join("")+'</div>'
    +'<label>חיפוש<input id="cl_q" value="'+esc(CL.q)+'"></label>'
    +(CL.form?formHtml(CL.form):'')
    +(rows.length?rows.map(function(c){
-     return '<div class="opt"><div class="info"><b>'+esc(c.title||"ללא כותרת")+'</b> <span class="pill" style="'+pillStyle(c.status)+'">'+esc(STL[c.status]||c.status)+'</span>'
-      +'<div class="meta">'+esc(c.name||"")+' · <span dir="ltr">'+esc(c.phone||"")+'</span> · '+esc((c.at||"").slice(0,10))+' '+(c.dir==="out"?'יוצאת':'נכנסת')+(c.follow?' · מעקב '+esc(c.follow):'')+(c.by?' · '+esc(c.by):'')+'</div>'
-      +(c.notes?'<div class="meta">'+esc(c.notes)+'</div>':'')+'</div>'
-      +'<div class="row"><a class="btn sm" href="tel:'+esc(c.phone||"")+'">התקשר</a><button class="btn sm" data-act="clEdit" data-id="'+esc(c.id)+'">ערוך</button></div></div>';
+     var cu=window.MERON_CUST&&window.MERON_CUST.get(c.phone),nm=c.name||(cu&&cu.name)||"",tm=c.at?new Date(c.at).toLocaleString("he-IL",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
+     var badge=c.auto?(c.answered?'<span class="pill ok">נענתה</span>':c.route!=null?'<span class="pill warn">לא נענתה</span>':'<span class="pill">נקלטה במרכזיה</span>'):'';
+     var ext=c.ext==="1"?"הזמנות ושירות":c.ext==="2"?"שיחה למארח":"";
+     return '<div class="opt stack"><div class="row between"><div class="info"><div style="font-size:19px;font-weight:700" dir="ltr">'+esc(c.phone||"מספר חסוי")+'</div>'
+      +'<div class="meta">'+esc(tm)+(nm?' · '+esc(nm):'')+(ext?' · '+ext:'')+(c.dir==="out"?' · יוצאת':'')+(c.by?' · '+esc(c.by):'')+(c.follow?' · מעקב '+esc(c.follow):'')+'</div></div>'
+      +'<div class="row">'+badge+'<span class="pill" style="'+pillStyle(c.status)+'">'+esc(STL[c.status]||c.status)+'</span></div></div>'
+      +(c.title?'<b>'+esc(c.title)+'</b>':'')+(c.notes?'<div class="meta">'+esc(c.notes)+'</div>':'')
+      +(c.title?'':'<div class="row"><input id="cq_'+esc(c.id)+'" placeholder="תאר בקצרה את השיחה" style="flex:1"><button class="btn sm primary" data-act="clQuick" data-id="'+esc(c.id)+'">שמור תיאור</button></div>')
+      +'<div class="row"><a class="btn sm" href="tel:'+esc(c.phone||"")+'">התקשר</a><button class="btn sm" data-act="clEdit" data-id="'+esc(c.id)+'">פתח ופרט</button></div></div>';
    }).join(""):'<div class="empty">אין שיחות להצגה.</div>');
   var qi=document.getElementById("cl_q");if(qi)qi.addEventListener("input",function(){CL.q=qi.value;var p=qi.selectionStart;draw();var n=document.getElementById("cl_q");if(n){n.focus();n.setSelectionRange(p,p)}});
   var ph=document.getElementById("cl_p");if(ph)ph.addEventListener("blur",function(){var c=window.MERON_CUST&&window.MERON_CUST.get(ph.value),n=document.getElementById("cl_n");if(c&&n&&!n.value)n.value=c.name||""});
@@ -64,6 +70,9 @@ X.act=function(act,id,el){
   if(act==="clNew"){CL.form={};draw();return true}
   if(act==="clClose"){CL.form=null;draw();return true}
   if(act==="clF"){CL.f=id;draw();return true}
+  if(act==="clQuick"){var inp=document.getElementById("cq_"+id),tx=inp?inp.value.trim():"";if(!tx){a.toast("כתוב תיאור קצר");return true}
+    var o=CL.rows.filter(function(c){return c.id===id})[0]||{},dd=Object.assign({},o,{title:tx});delete dd.id;
+    a.save("calls",id,dd,"התיאור נשמר").then(load);return true}
   if(act==="clEdit"){CL.form=CL.rows.filter(function(c){return c.id===id})[0]||{};draw();window.scrollTo({top:0,behavior:"smooth"});return true}
   if(act==="clSave"){
     var title=val("cl_t").trim(),phone=val("cl_p").trim();

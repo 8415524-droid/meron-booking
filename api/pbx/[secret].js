@@ -44,11 +44,37 @@ function toHost(m, service) {
   return [say("מחבר אותך למארח של " + placeName(m) + ". אנא המתן."), route("route2", phone)];
 }
 
+/* רישום השיחה ביומן השיחות באתר. לא מעכב ולא מפיל את השיחה אם נכשל. */
+async function logCall(secret, q) {
+  try {
+    const phone = normPhone(q.PBXphone);
+    const idKey = Object.keys(q).find((k) => /call.?id|uniq|session/i.test(k));
+    const now = new Date();
+    const call = (idKey && q[idKey]) || (phone + "_" + now.toISOString().slice(0, 16).replace(/\D/g, ""));
+    const patch = {};
+    const raw = {};
+    for (const k of Object.keys(q)) if (/^PBX/i.test(k) || /^route|^main$|^pick$/.test(k)) raw[k] = String(q[k]).slice(0, 120);
+    patch.pbx = raw;
+    if (q.main === "1" || q.main === "2") patch.ext = q.main;
+    const rv = q.route1 !== undefined ? q.route1 : q.route2;
+    if (rv !== undefined) { patch.route = String(rv).slice(0, 80); patch.answered = /answer|connect|ok|success/i.test(String(rv)) && !/no.?answer|busy|fail|cancel/i.test(String(rv)); }
+    if (q.PBXcallStatus === "HANGUP") patch.ended = true;
+    const ac = new AbortController(); const t = setTimeout(() => ac.abort(), 1500);
+    await fetch(SB_URL + "/rest/v1/rpc/pbx_log_call", {
+      method: "POST", signal: ac.signal,
+      headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_secret: secret, p_call: call, p_phone: phone, p_patch: patch }),
+    });
+    clearTimeout(t);
+  } catch (e) { /* לא חוסם */ }
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   const q = req.query || {};
   const send = (o) => res.status(200).send(JSON.stringify(o));
+  await logCall(String(q.secret || ""), q);
   try {
     // סיום שיחה או חזרה מניתוב: מנתקים
     if (q.PBXcallStatus === "HANGUP" || q.route1 !== undefined || q.route2 !== undefined) return send({ type: "hangup" });
