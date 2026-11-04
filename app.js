@@ -1,5 +1,5 @@
 (function(){
-var TABS=[["dash","דשבורד"],["intake","הזמנה חדשה"],["bookings","הזמנות"],["cal","יומן שבתות"],["month","תפוסה חודשית"],["props","בתים ויחידות"],["price","מחירון"],["ads","פרסום"],["ops","תחזוקה וניקיון"],["bills","חשבונות נכס"],["inv","חשבוניות"],["exp","הוצאות"],["pay","משכורות"],["ledger","הנהלת חשבונות"],["pl","רווח והפסד"],["fin","התחשבנות"],["requests","בקשות מהאתר"],["search","חיפוש לקוח"],["report","דוח לבעל בית"],["alerts","התראות"],["forecast","תחזית שבתות"],["backup","גיבוי"],["owners","בעלי נכסים"],["users","משתמשים והרשאות"],["pbx","מרכזיה"],["ical","סנכרון יומנים"],["agr","הסכמי בעלי נכסים"],["mine","היומן שלי"]];
+var TABS=[["dash","דשבורד"],["intake","הזמנה חדשה"],["bookings","הזמנות"],["cal","יומן שבתות"],["month","תפוסה חודשית"],["props","בתים ויחידות"],["price","מחירון"],["ads","פרסום"],["ops","תחזוקה וניקיון"],["bills","חשבונות נכס"],["inv","חשבוניות"],["exp","הוצאות"],["pay","משכורות"],["ledger","הנהלת חשבונות"],["pl","רווח והפסד"],["fin","התחשבנות"],["requests","בקשות מהאתר"],["search","חיפוש לקוח"],["report","דוח לבעל בית"],["alerts","התראות"],["forecast","תחזית שבתות"],["backup","גיבוי"],["owners","בעלי נכסים"],["users","משתמשים והרשאות"],["pbx","מרכזיה"],["ical","סנכרון יומנים"],["agr","הסכמי בעלי נכסים"],["mine","היומן שלי"],["cust","לקוחות"]];
 var CATS=["שיווק ופרסום","תוכנה ומערכות","טלפוניה","משרד ושכירות","נסיעות","ייעוץ מקצועי","עמלות סליקה","ביטוח","שונות"];
 var STATUS={pending:["ממתין לאישור","warn"],confirmed:["מאושר","ok"],in:["נכנסו","ok"],done:["הסתיים",""],cancelled:["בוטל","bad"]};
 var NEXT={pending:"confirmed",confirmed:"in","in":"done"};
@@ -47,10 +47,10 @@ function newId(col){return S.db.collection(col).doc().id}
 
 /* ---------- shell ---------- */
 var ROLE=window.MERON_ROLE||"admin";
-var ROLE_TABS={agent:["requests","intake","bookings","search","cal","month","props","alerts"],owner:["bookings","mine","cal","report"],vendor:["ops"],partner:["dash","bookings","forecast","pl","fin","ledger"]};
+var ROLE_TABS={agent:["requests","intake","bookings","cust","search","cal","month","props","alerts"],owner:["bookings","mine","cal","report"],vendor:["ops"],partner:["dash","bookings","forecast","pl","fin","ledger"]};
 var ROLE_HOME={viewer:"dash",admin:"dash",agent:"intake",owner:"bookings",vendor:"ops",partner:"dash"};
 function tabAllowed(k){if(k==="users"||k==="pbx"||k==="ical"||k==="agr")return ROLE==="admin";return ROLE==="admin"||ROLE==="viewer"||(ROLE_TABS[ROLE]||[]).indexOf(k)>=0}
-var GROUPS=[["הזמנות","book",["dash","requests","intake","bookings","search","cal","month","forecast","mine"]],["נכסים ושיווק","home",["owners","agr","props","price","ads","ical"]],["תפעול","tool",["ops","bills","alerts"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin","report"]],["מערכת","tool",["users","pbx","backup"]]];
+var GROUPS=[["הזמנות","book",["dash","requests","intake","bookings","cust","search","cal","month","forecast","mine"]],["נכסים ושיווק","home",["owners","agr","props","price","ads","ical"]],["תפעול","tool",["ops","bills","alerts"]],["כספים","coin",["inv","exp","pay","ledger","pl","fin","report"]],["מערכת","tool",["users","pbx","backup"]]];
 var GICON={'book': '<path d="M4 5h16v14H4zM4 10h16M9 5v14"/>', 'home': '<path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6"/>', 'tool': '<path d="M14 6a4 4 0 005 5l-9 9-3-3 9-9a4 4 0 00-2-2z"/>', 'coin': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10c0-2 6-2 6 0s-6 2-6 4 6 2 6 0"/>'};
 var GOPEN={};
 function saveG(){}
@@ -238,11 +238,13 @@ function act(a,id,el){
     var p=unitById(S.selId);if(!p)return;
     var name=val("b_name").trim(),phone=val("b_phone").trim();
     if(!name||!phone){toast("חסר שם או טלפון של האורח");return}
+    if(window.MERON_CUST_CHECK&&!window.MERON_CUST_CHECK())return;
     var ci=val("i_in"),co=val("i_out");
     if(!isFree(p,ci,co)){toast("הנכס כבר נתפס בתאריכים האלה");updIntake();return}
     var bid=newId("bookings");
     var total=+val("b_total")||0;
     if(window.MERON_DEPCHK&&!window.MERON_DEPCHK(total,+val("b_dep")||0))return;
+    if(window.MERON_CUST_SAVE)window.MERON_CUST_SAVE();
     save("bookings",bid,{propId:p.houseId,unitId:p.id,source:val("b_src"),name:name,phone:phone,guests:+val("i_g")||1,in:ci,out:co,total:total,dep:+val("b_dep")||0,
       pct:p.pct,status:"pending",notes:val("b_notes").trim(),ownerPaid:false,createdAt:Date.now()},"ההזמנה נשמרה").then(function(){
       if((+val("b_dep")||0)>0){if(window.MERON_RCPT)window.MERON_RCPT.issue(bid,+val("b_dep"),"");if(window.MERON_PBX_CB)window.MERON_PBX_CB(bid)}

@@ -64,7 +64,7 @@
       if(!role){sb.auth.signOut().then(function(){document.body.innerHTML="";location.reload()});return}
       window.MERON_ROLE=role==="guest"?"viewer":role;window.MERON_SB=sb;
       document.getElementById("appwrap").hidden=false;
-      loadScript("extras.js?v=1",function(){loadScript("app.js",function(){loadScript("quick.js?v=1",function(){loadScript("ical.js?v=1",function(){loadScript("contract.js?v=1")})})})});
+      loadScript("extras.js?v=1",function(){loadScript("app.js",function(){loadScript("quick.js?v=1",function(){loadScript("ical.js?v=1",function(){loadScript("contract.js?v=1",function(){loadScript("customers.js?v=1")})})})})});
       var hd=document.getElementById("sidebtns");
       if(hd){var b=document.createElement("button");b.className="btn sm";b.style.width="100%";b.textContent="יציאה";b.onclick=function(){sb.auth.signOut().then(function(){location.reload()})};hd.appendChild(b)}
     });

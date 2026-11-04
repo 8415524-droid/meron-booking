@@ -338,7 +338,7 @@ function rcUrl(r){return location.origin+"/receipt.html?t="+r.token}
 function rcRow(r){var u=rcUrl(r);var A_=A();
   return '<div class="opt"><div class="info"><b>קבלה '+esc(r.no)+'</b><div class="meta">'+esc(r.date)+' · '+A_.money(r.amount)+(r.method?' · '+esc(r.method):'')+'</div></div><div class="row">'
    +'<a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener">פתח</a>'
-   +'<a class="btn sm" target="_blank" rel="noopener" href="'+esc(wa(r.phone,"שלום "+(r.customer||"")+", מצורפת קבלה מספר "+r.no+" על סך "+A_.money(r.amount)+": "+u)||"#")+'">שלח בוואטסאפ</a>'
+   +(window.MERON_CUST&&window.MERON_CUST.get(r.phone)&&window.MERON_CUST.get(r.phone).kosher?'':'<a class="btn sm" target="_blank" rel="noopener" href="'+esc(wa(r.phone,"שלום "+(r.customer||"")+", מצורפת קבלה מספר "+r.no+" על סך "+A_.money(r.amount)+": "+u)||"#")+'">שלח בוואטסאפ</a>')
    +'<button class="btn sm" data-act="rcCopy" data-id="'+esc(u)+'">העתק קישור</button></div></div>'}
 function rcShow(bookingId,msg){
   var a=A();
