@@ -108,6 +108,14 @@ function owLoad(){
       if(A().S.tab==="mine")owDraw()});
   });
 }
+function upcoming(){
+  var a=A(),t=a.today();
+  var l=a.S.bookings.filter(function(b){return b.out>=t&&(b.status==="confirmed"||b.status==="in")}).sort(function(x,y){return x.in<y.in?-1:1});
+  if(!l.length)return '<div class="meta">אין הזמנות מאושרות קרובות.</div>';
+  return l.map(function(b){var c=b.cust||{};
+    return '<div class="opt"><div class="info"><b>'+esc(b.name)+'</b> · '+esc(a.unitLabel(b))+'<div class="meta">'+a.fmt(b.in)+' עד '+a.fmt(b.out)+' ('+a.heb(b.in)+' עד '+a.heb(b.out)+') · '+(b.guests||"?")+' אורחים'+(c.city?' · '+esc(c.city):'')+'</div>'
+     +(c.note||b.notes?'<div class="meta">'+esc([c.note,b.notes].filter(Boolean).join(" · "))+'</div>':'')+'</div><a class="btn sm" href="tel:'+esc(b.phone||"")+'">התקשר ללקוח <span dir="ltr">'+esc(b.phone||"")+'</span></a></div>'}).join("");
+}
 function owDraw(){
   var el=document.getElementById("ow2_box");if(!el)return;
   var a=A(),us=a.bookables();
@@ -116,6 +124,7 @@ function owDraw(){
    +'<div class="grid2"><label>יחידה<select id="ow2_u">'+opts+'</select></label><label>הערה<input id="ow2_n" placeholder="לדוגמה: אורחים שלי"></label>'
    +'<label>מתאריך<input type="date" data-no-today id="ow2_f"></label><label>עד (יציאה)<input type="date" data-no-today id="ow2_t"></label></div>'
    +'<div class="row"><button class="btn primary" data-act="owBlock">סמן כתפוס</button></div>'
+   +'<h3>ההזמנות הקרובות שלי</h3>'+upcoming()
    +'<h3>מחיר לתאריכים</h3><div class="grid2"><label>מתאריך<input type="date" data-no-today id="ow2_pf"></label><label>עד<input type="date" data-no-today id="ow2_pt"></label><label>מחיר ללילה (₪)<input type="number" min="0" id="ow2_pp"></label><label>הערה<input id="ow2_pn" placeholder="חג, עונה"></label></div>'
    +'<div class="row"><button class="btn primary" data-act="owPrice">שמור מחיר</button></div>'
    +'<h3>מה עודכן</h3>'+(OW.blocks.concat(OW.prices).length?OW.blocks.map(function(b){return '<div class="opt"><div class="info"><b>תפוס</b> '+esc(b.from)+' עד '+esc(b.to)+'<div class="meta">'+esc(b.unitName||"")+' · '+esc(b.note||"")+'</div></div><button class="btn sm danger" data-act="owDel2" data-id="'+esc(b.id)+'">הסר</button></div>'}).join("")

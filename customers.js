@@ -59,6 +59,7 @@ window.MERON_CUST_CHECK=function(){
   if(idno&&idno.length<5){A().toast("מספר הזהות קצר מדי");return false}
   return true;
 };
+window.MERON_CUST_SNAP=function(){if(!document.getElementById("c_kosher"))return null;return {city:val("c_city").trim(),note:val("c_note").trim(),phone2:val("c_ph2").trim()}};
 window.MERON_CUST_SAVE=function(){
   if(!document.getElementById("c_kosher"))return Promise.resolve("");
   return window.MERON_CUST.upsert({name:val("b_name").trim(),phone:val("b_phone").trim(),idno:val("c_idno").replace(/\D/g,""),city:val("c_city").trim(),phone2:val("c_ph2").trim(),note:val("c_note").trim()});

@@ -161,6 +161,7 @@ function updBookings(){
      +'<div class="meta">'+fmt(b.in)+' עד '+fmt(b.out)+' · '+(b.guests||"?")+' אורחים · <span dir="ltr">'+esc(b.phone||"")+'</span></div></div>'
      +'<span class="pill '+st[1]+'">'+st[0]+'</span></div>'
      +'<div class="meta">סכום '+money(b.total)+' · מקדמה '+money(b.dep)+' · יתרה לגבייה '+money(due)+' · עמלה '+money(comm)+(b.ownerPaid?' · שולם לבעל הדירה':'')+'</div>'
+     +(b.cust&&(b.cust.city||b.cust.note)?'<div class="meta">פרטי לקוח: '+esc([b.cust.city,b.cust.note].filter(Boolean).join(" · "))+'</div>':'')
      +(b.notes?'<div class="meta">הערה: '+esc(b.notes)+'</div>':'')
      +'<div class="row">'
      +'<button class="btn sm" data-act="copyMsg" data-id="'+b.id+'">העתק הודעת אישור</button>'
@@ -246,7 +247,7 @@ function act(a,id,el){
     if(window.MERON_DEPCHK&&!window.MERON_DEPCHK(total,+val("b_dep")||0))return;
     if(window.MERON_CUST_SAVE)window.MERON_CUST_SAVE();
     save("bookings",bid,{propId:p.houseId,unitId:p.id,source:val("b_src"),name:name,phone:phone,guests:+val("i_g")||1,in:ci,out:co,total:total,dep:+val("b_dep")||0,
-      pct:p.pct,status:"pending",notes:val("b_notes").trim(),ownerPaid:false,createdAt:Date.now()},"ההזמנה נשמרה").then(function(){
+      pct:p.pct,status:"pending",cust:(window.MERON_CUST_SNAP?window.MERON_CUST_SNAP():null),notes:val("b_notes").trim(),ownerPaid:false,createdAt:Date.now()},"ההזמנה נשמרה").then(function(){
       if((+val("b_dep")||0)>0){if(window.MERON_RCPT)window.MERON_RCPT.issue(bid,+val("b_dep"),"");if(window.MERON_PBX_CB)window.MERON_PBX_CB(bid)}
       S.selId=null;S.draft=null;mountIntake($("view"));
     });
@@ -254,7 +255,7 @@ function act(a,id,el){
   }
   if(a==="filter"){S.filter=id;updBookings();return}
   var b=S.bookings.filter(function(x){return x.id===id})[0];
-  if(a==="advance"&&b)return save("bookings",b.id,Object.assign({},b.raw,{status:NEXT[b.status]}),"הסטטוס עודכן");
+  if(a==="advance"&&b){var upd={status:NEXT[b.status]};if(NEXT[b.status]==="confirmed"){upd.ownerNotified=new Date().toISOString();var cc=window.MERON_CUST&&window.MERON_CUST.get(b.phone);if(cc)upd.cust={city:cc.city||"",note:cc.note||"",phone2:cc.phone2||""}}return save("bookings",b.id,Object.assign({},b.raw,upd),NEXT[b.status]==="confirmed"?"ההזמנה אושרה ופרטי הלקוח זמינים לבעל הנכס":"הסטטוס עודכן")}
   if(a==="cancelB"&&b&&window.MERON_CANCEL)return window.MERON_CANCEL(b);
   if(a==="cancelB"&&b)return save("bookings",b.id,Object.assign({},b.raw,{status:"cancelled"}),"ההזמנה בוטלה");
   if(a==="ownerPaid"&&b)return save("bookings",b.id,Object.assign({},b.raw,{ownerPaid:true}),"סומן ששולם");
