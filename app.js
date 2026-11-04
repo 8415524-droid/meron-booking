@@ -26,9 +26,9 @@ function mult(d){var s=seasonOf(d);return 1+((s&&s.pct)||0)/100}
 function estimate(p,ci,co){
   var n=nights(ci,co);if(n<=0)return 0;
   var pf=window.MERON_PRICE,ov=false;
-  if(pf)for(var j=0;j<n;j++){if(pf(p.id,iso(addDays(ci,j)))!=null)ov=true}
+  if(pf)for(var j=0;j<n;j++){if(pf(p.id,addDays(ci,j))!=null)ov=true}
   if(!ov&&p.shabbatPrice&&n===2&&parse(ci).getDay()===5)return Math.round(p.shabbatPrice*mult(ci));
-  var t=0;for(var i=0;i<n;i++){var dd=iso(addDays(ci,i)),op=pf?pf(p.id,dd):null;t+=(op!=null?op:(p.price||0))*mult(addDays(ci,i))}
+  var t=0;for(var i=0;i<n;i++){var dd=addDays(ci,i),op=pf?pf(p.id,dd):null;t+=(op!=null?op:(p.price||0))*mult(addDays(ci,i))}
   return Math.round(t);
 }
 

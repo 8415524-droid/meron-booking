@@ -64,7 +64,7 @@ X.act=function(act,id,el){
     A().save("extical",id,EX.rows[id]).then(function(){sync(id)});return true}
   if(act==="icPaste"){var tx=document.getElementById("ic_p_"+id).value,rg=[];
     tx.split(/\n/).forEach(function(l){var ds=[],re=/(\d{4})-(\d{1,2})-(\d{1,2})|(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/g,m;while((m=re.exec(l))){var y=m[1]||m[6],mo=m[2]||m[5],d=m[3]||m[4];ds.push(y+"-"+("0"+mo).slice(-2)+"-"+("0"+d).slice(-2))}
-      if(ds.length)rg.push({in:ds[0],out:ds.length>1&&ds[1]>ds[0]?ds[1]:A().iso(A().addDays(A().parse(ds[0]),1))})});
+      if(ds.length)rg.push({in:ds[0],out:ds.length>1&&ds[1]>ds[0]?ds[1]:A().addDays(ds[0],1)})});
     if(!rg.length){A().toast("לא נמצאו תאריכים");return true}
     var o=EX.rows[id]||{};EX.rows[id]=Object.assign({},o,{unitId:id,ranges:(o.ranges||[]).concat(rg),manual:true});A().save("extical",id,EX.rows[id],"התאריכים נשמרו").then(draw);return true}
   if(act==="icDel"){if(!confirm("להסיר את הייבוא? התאריכים החסומים יתפנו."))return true;delete EX.rows[id];A().del("extical",id);draw();return true}

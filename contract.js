@@ -16,8 +16,8 @@ function isRest(d){
     return !!(HOL[mon]&&HOL[mon].indexOf(day)>=0)}catch(e){return false}
 }
 function workDaysBefore(inIso){
-  var a=A(),d=a.parse(a.today()),end=a.parse(inIso),n=0;
-  while(d<end){if(!isRest(d))n++;d=a.parse(a.iso(a.addDays(d,1)))}
+  var a=A(),d=a.today(),n=0;
+  while(d<inIso){if(!isRest(a.parse(d)))n++;d=a.addDays(d,1)}
   return n;
 }
 window.MERON_WORKDAYS=workDaysBefore;
