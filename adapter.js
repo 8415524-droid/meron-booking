@@ -69,9 +69,9 @@
       if(hd){var b=document.createElement("button");b.className="btn sm";b.style.width="100%";b.textContent="יציאה";b.onclick=function(){sb.auth.signOut().then(function(){location.reload()})};hd.appendChild(b)}
     });
   }
-  var LOGO='<img class="logo-tile" src="logo-mark.png" alt="">';
+  var LOGO='<img class="logo-tile" src="logo-mark.webp" width="192" height="192" alt="">';
   function loginView(msg){
-    var o=el('<div class="login"><div class="login-art"><div class="login-brand"><div class="logo-wrap"><div class="logo-card"><img class="logo-full" src="logo-full.png" alt="כשר מירון"></div><div class="logo-tag">דירות אירוח · שבתות וחגים · מירון</div></div></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p></div>'
+    var o=el('<div class="login"><div class="login-art"><div class="login-brand"><div class="logo-wrap"><div class="logo-card"><img class="logo-full" src="logo-full.webp" width="720" height="441" alt="כשר מירון"></div><div class="logo-tag">דירות אירוח · שבתות וחגים · מירון</div></div></div><h2>ניהול בתי אירוח במירון,<br>במקום אחד.</h2><p>הזמנות, יומן תפוסה, חשבונות עם בעלי נכסים, משכורות ורווחיות. הכול מסודר ובשליטה.</p></div>'
       +'<div class="login-form"><div class="login-card"><h3>כניסה למערכת</h3><div class="meta">כניסה לצוות בלבד. המשתמשים מוגדרים על ידי המנהל.</div>'
       +'<label>אימייל<input id="lg_e" type="email" autocomplete="username" dir="ltr" style="text-align:right"></label>'
       +'<label id="lg_pw" hidden>סיסמה<input id="lg_p" type="password" autocomplete="current-password" dir="ltr" style="text-align:right"></label>'

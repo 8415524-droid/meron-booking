@@ -30,7 +30,7 @@ dl{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;margin:18px 0}dt{co
     var x=r.data;if(r.error||!x){app.innerHTML='<div id="err">הקבלה לא נמצאה</div>';return}
     var cr=x.kind==="credit";document.title=(cr?"קבלת זיכוי ":"קבלה מספר ")+x.no;
     app.innerHTML='<div class="sheet"><div class="top"><div class="co"><b>'+esc(x.company)+'</b>'
-     +(x.companyId?'<span>ח.פ '+esc(x.companyId)+'</span>':'')+(x.companyAddr?'<span>'+esc(x.companyAddr)+'</span>':'')+(x.companyPhone?'<span>טלפון '+esc(x.companyPhone)+'</span>':'')+'</div><img src="logo-full.png" alt=""></div>'
+     +(x.companyId?'<span>ח.פ '+esc(x.companyId)+'</span>':'')+(x.companyAddr?'<span>'+esc(x.companyAddr)+'</span>':'')+(x.companyPhone?'<span>טלפון '+esc(x.companyPhone)+'</span>':'')+'</div><img src="logo-full.webp" alt=""></div>'
      +'<h1>'+(cr?'קבלת זיכוי מספר ':'קבלה מספר ')+esc(x.no)+'</h1>'+(cr?'<div class="no">מתייחסת לקבלה מספר '+esc(x.refNo)+(x.reason?' · '+esc(x.reason):'')+'</div>':'')+'<div class="no">תאריך '+d(x.date)+' · '+esc(x.time)+'</div>'
      +'<dl><dt>התקבל מאת</dt><dd>'+esc(x.customer)+'</dd>'
      +'<dt>עבור</dt><dd>אירוח: '+esc(x.house)+(x.unit?' · '+esc(x.unit):'')+'</dd>'
