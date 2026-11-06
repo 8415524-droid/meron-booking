@@ -16,6 +16,7 @@ module.exports = async (req, res) => {
     "DTSTART;VALUE=DATE:" + d8(b.in), "DTEND;VALUE=DATE:" + d8(b.out), "SUMMARY:תפוס", "TRANSP:OPAQUE", "END:VEVENT",
   ].join("\r\n"));
   res.setHeader("Content-Type", "text/calendar; charset=utf-8");
-  res.setHeader("Cache-Control", "public, max-age=300");
+  // מטמון ברשת של ורסל: Airbnb/Booking דוגמים את היומן כל כמה דקות; כך רוב הדגימות לא מפעילות פונקציה ולא שאילתה.
+  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=900, stale-while-revalidate=3600");
   res.status(200).send(["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//meron-booking//he", "CALSCALE:GREGORIAN", "X-WR-CALNAME:כשר מירון", ...ev, "END:VCALENDAR"].join("\r\n"));
 };

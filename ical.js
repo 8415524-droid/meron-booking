@@ -73,6 +73,7 @@ X.act=function(act,id,el){
 /* רענון אוטומטי */
 function auto(){
   if(!sb()||!A()||(A().role!=="admin"&&A().role!=="agent"))return;
+  if(document.visibilityState==="hidden")return; /* לשונית ברקע — לא מסנכרנים; הסבב הבא כשהיא גלויה */
   load().then(function(){Object.keys(EX.rows).forEach(function(id){var r=EX.rows[id];if(r.url&&(!r.at||Date.now()-new Date(r.at).getTime()>30*60000))sync(id)})});
 }
 setTimeout(auto,3000);setInterval(auto,30*60000);
