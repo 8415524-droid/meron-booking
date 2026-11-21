@@ -113,10 +113,10 @@
     return;
   }
   /* קישור כניסה ישירה בזמן הבנייה: https://…/#k=<סיסמה>. הסיסמה לא נשמרת בקוד, רק בקישור שמחזיק המנהל. מבטלים בעת ההשקה: מוחקים את המשתמש builder@meron-booking.app. */
-  var km=(location.hash||"").match(/[#&]k=([^&]+)/),vm=(location.hash||"").match(/[#&]v=([^&]+)/);
-  if(km||vm){
+  var km=(location.hash||"").match(/[#&]k=([^&]+)/),vm=(location.hash||"").match(/[#&]v=([^&]+)/),om=(location.hash||"").match(/[#&]o=([^&]+)/);
+  if(km||vm||om){
     history.replaceState(null,"",location.pathname+location.search);
-    sb.auth.signInWithPassword({email:km?"builder@meron-booking.app":"guest@meron-booking.app",password:decodeURIComponent((km||vm)[1])}).then(function(r){
+    sb.auth.signInWithPassword({email:km?"builder@meron-booking.app":om?"owner-demo@meron-booking.app":"guest@meron-booking.app",password:decodeURIComponent((km||vm||om)[1])}).then(function(r){
       if(r.error)loginView("קישור הכניסה אינו תקף. היכנס עם אימייל.");else startApp();
     });
     return;
