@@ -1,0 +1,22 @@
+# אתר מירון. הרצה מתוך /opt/meron-booking:  docker compose -f deploy/docker-compose.yml up -d --build
+# ה-HTTPS נעשה בפרוקסי המשותף (/opt/proxy) שמחובר לרשת web.
+name: meron
+services:
+  meron-app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: meron-app:latest
+    restart: unless-stopped
+    mem_limit: 256m
+    expose: ["3000"]
+    networks: [web]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:3000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+networks:
+  web:
+    name: web
+    external: true
