@@ -1,0 +1,8 @@
+[Unit]
+Description=Meron auto-update from GitHub
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/meron-update
+TimeoutStartSec=20min
