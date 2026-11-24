@@ -54,7 +54,7 @@ function rqWatch(){
 X.tabs.requests={
   mount:function(v){
     v.innerHTML='<div class="stack"><div class="panel"><h2>בקשות הזמנה מהאתר</h2><div class="meta">לקוחות שהשאירו פרטים באתר ההזמנה. אשר כדי ליצור הזמנה, או דחה.</div><div class="row" style="margin-top:8px"><span class="meta">כתובת האתר לשיתוף:</span><a dir="ltr" href="book.html" target="_blank" id="rq_link"></a></div></div><div class="list" id="rq_list"></div></div>';
-    $("rq_link").textContent=location.origin+"/book.html";rqWatch();X.tabs.requests.upd();
+    $("rq_link").textContent=location.origin+(window.MERON_BASE||"")+"/book.html";rqWatch();X.tabs.requests.upd();
     function $(i){return document.getElementById(i)}
   },
   upd:function(){
@@ -306,7 +306,7 @@ X.tabs.pbx={
     var el=document.getElementById("pb_box");if(!el)return;
     if(!PB.loaded){el.innerHTML='<div class="empty">טוען…</div>';return}
     if(PB.err||!PB.cfg){el.innerHTML='<div class="note">לא ניתן לטעון. ייתכן שהסקריפט supabase/pbx.sql עדיין לא הורץ ב-Supabase. '+esc(PB.err||"")+'</div>';return}
-    var c=PB.cfg,url=location.origin+"/api/pbx/"+c.secret;
+    var c=PB.cfg,url=location.origin+(window.MERON_BASE||"")+"/api/pbx/"+c.secret;
     el.innerHTML='<h2>מרכזיה (טכנוליין)</h2>'
      +'<div class="meta">שתי שלוחות: <b>1</b> מעבירה להזמנות ולשירות לקוחות, <b>2</b> מזהה לקוח קיים לפי מספר הטלפון שממנו התקשר, ומחברת אותו ישירות למארח של ההזמנה שלו. אם יש כמה הזמנות פעילות, הלקוח בוחר. בלי הזמנה פעילה, מחברים לפי ההזמנה האחרונה.</div>'
      +'<label>כתובת להזנה בטכנוליין (שלוחה מסוג API)<input id="pb_url" readonly dir="ltr" style="text-align:left" value="'+esc(url)+'"></label>'
@@ -324,7 +324,7 @@ window.MERON_PBX_CB=function(bookingId){
   if(!sb()||!sb().auth)return;
   sb().auth.getSession().then(function(s){
     var t=s&&s.data&&s.data.session&&s.data.session.access_token;if(!t)return;
-    fetch("/api/pbx-callback",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({booking:bookingId})})
+    fetch((window.MERON_BASE||"")+"/api/pbx-callback",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({booking:bookingId})})
      .then(function(r){return r.json()}).then(function(j){if(j&&j.skipped)return;A().toast(j&&j.ok?j.note:(j&&(j.error||j.note))||"הצינתוק נכשל")}).catch(function(){});
   });
 };
@@ -334,7 +334,7 @@ window.MERON_PBX_CB=function(bookingId){
 var RC={};
 function rcModal(html){var m=document.getElementById("rc_modal");if(!m){m=document.createElement("div");m.id="rc_modal";m.style.cssText="position:fixed;inset:0;z-index:70;background:rgba(5,15,18,.55);display:flex;align-items:center;justify-content:center;padding:16px";m.addEventListener("click",function(ev){if(ev.target===m)m.remove()});document.body.appendChild(m)}
   m.innerHTML='<div class="panel stack" style="max-width:480px;width:100%;max-height:90vh;overflow:auto">'+html+'<div class="row"><button class="btn" data-act="rcClose">סגור</button></div></div>'}
-function rcUrl(r){return location.origin+"/receipt.html?t="+r.token}
+function rcUrl(r){return location.origin+(window.MERON_BASE||"")+"/receipt.html?t="+r.token}
 function rcRow(r){var u=rcUrl(r);var A_=A();
   return '<div class="opt"><div class="info"><b>קבלה '+esc(r.no)+'</b><div class="meta">'+esc(r.date)+' · '+A_.money(r.amount)+(r.method?' · '+esc(r.method):'')+'</div></div><div class="row">'
    +'<a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener">פתח</a>'

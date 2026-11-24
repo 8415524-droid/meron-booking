@@ -151,6 +151,7 @@ body.ro .topbar::after{content:'צפייה בלבד';font-size:12px;font-weight:
   <aside class="side" id="side">
     <div class="brand brand-logo"><div class="logo-wrap"><div class="logo-card"><img class="logo-full" src="logo-full.webp" width="720" height="441" alt="כשר מירון"></div><div class="logo-tag">דירות אירוח · שבתות וחגים · מירון</div></div><span class="desc" hidden></span></div>
     <nav role="tablist" id="tabs" aria-label="תפריט ראשי"></nav>
+    <a id="sw_new" href="/" style="display:none;margin:10px 14px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.12);color:inherit;text-align:center;text-decoration:none;font-size:14px">למעבר למערכת נייחא החדשה ←</a>
     <div class="sidefoot"><span class="sub" id="status">טוען נתונים…</span><div id="sidebtns"></div></div>
   </aside>
   <div class="mainc">
@@ -164,7 +165,7 @@ body.ro .topbar::after{content:'צפייה בלבד';font-size:12px;font-weight:
 <div class="scrim" id="scrim"></div>
 <div class="toast" id="toast" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
+<script src="config.js"></script><script>if(window.MERON_BASE)document.getElementById("sw_new").style.display="block"</script>
 <script src="adapter.js"></script>
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){})</script>
 </body>
