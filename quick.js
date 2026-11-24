@@ -94,3 +94,20 @@ wrap.addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&Q.open)close()});
 setInterval(function(){if(Q.open&&document.activeElement&&document.activeElement.closest&&!document.activeElement.closest("#q_form"))run()},4000);
 })();
+
+/* ---- חיפוש הזמנה: כפתור צף בכל המסכים (ליד "הזמנה חדשה"), פותח את מסך ההזמנות עם חיפוש לפי שם, טלפון או נכס ---- */
+(function(){
+if(A.role==="vendor")return;
+var st2=document.createElement("style");
+st2.textContent='.qsearch{position:fixed;left:170px;bottom:20px;z-index:40;border:1px solid var(--line,#cfd8dc);border-radius:99px;padding:13px 18px;font:700 15px var(--font-ui,sans-serif);cursor:pointer;color:var(--ink,#123);background:var(--panel,#fff);box-shadow:0 4px 14px rgba(0,0,0,.18)}@media (max-width:700px){.qsearch{left:150px;bottom:12px;padding:12px 14px}}@media print{.qsearch{display:none!important}}';
+document.head.appendChild(st2);
+var b2=document.createElement("button");b2.className="qsearch";b2.type="button";b2.textContent="🔍 חיפוש הזמנה";b2.setAttribute("aria-label","חיפוש הזמנה לפי שם, טלפון או נכס");
+b2.addEventListener("click",function(){
+  A.go("bookings");
+  setTimeout(function(){
+    var all=document.querySelector('#bk_f [data-id="all"]');if(all&&all.getAttribute("aria-pressed")!=="true")all.click();
+    var q=document.getElementById("bk_q");if(q){q.focus();q.select()}
+  },60);
+});
+document.body.appendChild(b2);
+})();
