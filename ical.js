@@ -17,12 +17,12 @@ function load(){
     if(A().S.tab==="ical")draw();
   });
 }
-function feedUrl(id){return location.origin+"/api/ical-feed?s="+encodeURIComponent(EX.secret||"")+"&id="+encodeURIComponent(id)}
+function feedUrl(id){return location.origin+(window.MERON_BASE||"")+"/api/ical-feed?s="+encodeURIComponent(EX.secret||"")+"&id="+encodeURIComponent(id)}
 function sync(id){
   var row=EX.rows[id];if(!row||!row.url||EX.busy[id])return Promise.resolve();
   EX.busy[id]=1;if(A().S.tab==="ical")draw();
   return token().then(function(t){
-    return fetch("/api/ical-fetch",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({url:row.url})}).then(function(r){return r.json()});
+    return fetch((window.MERON_BASE||"")+"/api/ical-fetch",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({url:row.url})}).then(function(r){return r.json()});
   }).catch(function(e){return {ok:false,error:e.message}}).then(function(j){
     var d=Object.assign({},row,{at:new Date().toISOString(),err:j.ok?"":j.error});
     if(j.ok)d.ranges=j.ranges;
